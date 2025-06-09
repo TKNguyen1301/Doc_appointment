@@ -8,7 +8,7 @@ class AppointmentPage extends StatefulWidget{
   _AppointmentPageState createState() => _AppointmentPageState();
 }
 class _AppointmentPageState extends State<AppointmentPage> {
-  final List<Appointment> _appointments = [];
+  final List<Appointment> _appointments = ["jalsd",];
 
   @override
   Widget build(BuildContext context) {
