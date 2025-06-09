@@ -1,0 +1,429 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutterproject/features/screens/booking/booking_result_page.dart';
+import 'package:flutterproject/features/screens/doctor_data.dart';
+
+class ConfirmationPage extends StatelessWidget {
+  final Doctor doctor;
+  final DateTime selectedDate;
+  final String selectedSlot;
+  final Map<String, String> patientProfile;
+  final String healthInsuranceCode;
+  final String citizenId;
+  final String address;
+
+  final String bookingCode;
+  final int sttNumber;
+  final String clinicAddress;
+  final DateTime bookedAt;
+
+  // Thêm 2 biến mới:
+  final String extraInfoText;
+  final List<File> extraImages;
+
+  const ConfirmationPage({
+    Key? key,
+    required this.doctor,
+    required this.selectedDate,
+    required this.selectedSlot,
+    required this.patientProfile,
+    this.healthInsuranceCode = '--',
+    this.citizenId = 'Chưa cập nhật',
+    this.address = '--',
+    required this.bookingCode,
+    required this.sttNumber,
+    required this.clinicAddress,
+    required this.bookedAt,
+    // Bổ sung 2 biến
+    this.extraInfoText = '',
+    this.extraImages = const [],
+  }) : super(key: key);
+
+  // Helper để format ngày (ví dụ "T6 06/06/2025")
+  String _formatDate(DateTime dt) {
+    final weekdayMap = {
+      1: 'T2',
+      2: 'T3',
+      3: 'T4',
+      4: 'T5',
+      5: 'T6',
+      6: 'T7',
+      7: 'CN',
+    };
+    final wd = weekdayMap[dt.weekday]!;
+    final d = dt.day.toString().padLeft(2, '0');
+    final m = dt.month.toString().padLeft(2, '0');
+    final y = dt.year.toString();
+    return '$wd $d/$m/$y';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final String dateLabel = _formatDate(selectedDate);
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.blue,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: const Text(
+          'Xác nhận thông tin',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          // ====== Phần indicator bước (nếu có) ======
+          // ... Nếu bạn có indicator "1 – 2 – 3" thì giữ nguyên ...
+          // Hoặc bỏ qua nếu không cần.
+
+          // ====== Phần nội dung chính ======
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ===========================
+                  // Thông tin bác sĩ + giờ khám + ngày khám
+                  // ===========================
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(24),
+                          child: Image.asset(
+                            doctor.image,
+                            width: 48,
+                            height: 48,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                doctor.title,
+                                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                doctor.name,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Chuyên khoa: ${doctor.specialty}',
+                                style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Giờ khám: $selectedSlot',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Ngày khám: $dateLabel',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // ===========================
+                  // Thông tin bệnh nhân
+                  // ===========================
+                  const Text(
+                    'Thông tin bệnh nhân',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade200),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            const Text('Họ và tên', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                            const Spacer(),
+                            Text(
+                              patientProfile['name']!,
+                              style: const TextStyle(fontSize: 14, color: Colors.black87),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            const Text('Ngày sinh', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                            const Spacer(),
+                            Text(
+                              patientProfile['birthdate']!,
+                              style: const TextStyle(fontSize: 14, color: Colors.black87),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            const Text('Giới tính', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                            const Spacer(),
+                            Text(
+                              patientProfile['gender']!,
+                              style: const TextStyle(fontSize: 14, color: Colors.black87),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            const Text('Số điện thoại', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                            const Spacer(),
+                            Row(
+                              children: [
+                                Text(
+                                  patientProfile['phone']!,
+                                  style: const TextStyle(fontSize: 14, color: Colors.black87),
+                                ),
+                                const SizedBox(width: 4),
+                                GestureDetector(
+                                  onTap: () {
+                                    // TODO: copy phone nếu cần
+                                  },
+                                  child: Icon(
+                                    Icons.copy,
+                                    size: 20,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Center(
+                          child: TextButton(
+                            onPressed: () {
+                              // TODO: điều hướng sang trang chi tiết hồ sơ nếu cần
+                            },
+                            child: Text(
+                              'Xem chi tiết',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.blue.shade700,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+                  
+                  // Xác định chỗ muốn hiển thị (ví dụ, sau “Thông tin bệnh nhân” và trước “Chi tiết thanh toán”)
+                  if (extraInfoText.isNotEmpty || extraImages.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Thông tin bổ sung',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (extraInfoText.isNotEmpty) ...[
+                            const Text(
+                              'Lý do thăm khám:',
+                              style: TextStyle(fontSize: 14, color: Colors.grey),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              extraInfoText,
+                              style: const TextStyle(fontSize: 14, color: Colors.black87),
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+                          if (extraImages.isNotEmpty) ...[
+                            const Text(
+                              'Ảnh đính kèm:',
+                              style: TextStyle(fontSize: 14, color: Colors.grey),
+                            ),
+                            const SizedBox(height: 4),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: extraImages.map((file) {
+                                return ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.file(
+                                    file,
+                                    width: 70,
+                                    height: 70,
+                                    fit: BoxFit.cover,
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+
+                  // ===========================
+                  // Chi tiết thanh toán (nếu có)
+                  // ===========================
+                  const Text(
+                    'Chi tiết thanh toán',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade200),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            const Text('Phí khám', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                            const Spacer(),
+                            Text(
+                              '0 đ',
+                              style: const TextStyle(fontSize: 14, color: Colors.black87),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            const Text('Phí tiện ích', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                            const Spacer(),
+                            Text(
+                              'Miễn phí',
+                              style: const TextStyle(fontSize: 14, color: Colors.black87),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        const Divider(),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Text(
+                              'Tổng thanh toán',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+                            ),
+                            const Spacer(),
+                            Text(
+                              '0 đ',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 80),
+                  // Khoảng trống để tránh che nút “Xác nhận đặt lịch”
+                ],
+              ),
+            ),
+          ),
+
+          // ================================================
+          // Nút “Xác nhận đặt lịch” – đã chuyển hướng sang BookingResultPage
+          // ================================================
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                onPressed: () {
+                  // Khi bấm “Xác nhận đặt lịch”, mở màn BookingResultPage
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => BookingResultPage(
+                        doctor: doctor,
+                        selectedDate: selectedDate,
+                        selectedSlot: selectedSlot,
+                        patientProfile: patientProfile,
+                        bookingCode: bookingCode,
+                        sttNumber: sttNumber,
+                        clinicAddress: clinicAddress,
+                        bookedAt: bookedAt,
+                        extraInfoText: extraInfoText,
+                        extraImages: extraImages,
+                      ),
+                    ),
+                  );
+                },
+                child: const Text(
+                  'Xác nhận đặt lịch',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
