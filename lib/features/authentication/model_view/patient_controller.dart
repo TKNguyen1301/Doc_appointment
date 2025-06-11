@@ -7,7 +7,7 @@ import 'package:flutterproject/features/authentication/model/patient.dart';
 import 'package:flutterproject/features/authentication/model/user.dart';
 import 'package:flutterproject/features/patient/model/appointment.dart';
 import 'package:flutterproject/features/patient/model/payment.dart';
-import 'package:flutterproject/features/patient/model/doctor.dart';
+import 'package:flutterproject/features/home/model/doctor.dart';
 
 class PatientController extends ChangeNotifier {
   final String _baseUrl = 'http://localhost:5001/api/patient';
