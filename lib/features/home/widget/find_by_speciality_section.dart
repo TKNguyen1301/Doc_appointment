@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutterproject/features/home/widget/speciality_card.dart';
 import 'package:flutterproject/features/home/view_model/specialization_controller.dart';
 import 'package:flutterproject/features/home/model/specialization.dart';
@@ -41,17 +42,39 @@ class _FindBySpecialitySectionState extends State<FindBySpecialitySection> {
       setState(() {
         error = e.toString();
         isLoading = false;
-        // Fallback data nếu không load được từ API
-        specializations = [
-          Specialization(
-            specializationId: 1,
-            name: 'General physician',
-            image: '', // Empty string để dùng SVG mặc định
-            fees: 100,
-          ),
-        ];
+        
+        // Fallback data an toàn hơn
+        specializations = _createFallbackSpecializations();
       });
+      
+      // Log the error for debugging
+      if (kDebugMode) {
+        print('Error loading specializations: $e');
+      }
     }
+  }
+
+  List<Specialization> _createFallbackSpecializations() {
+    return [
+      Specialization(
+        specializationId: 1,
+        name: 'General Physician',
+        image: 'https://cdn1.youmed.vn/tin-tuc/wp-content/uploads/2023/05/yhocduphong.png',
+        fees: 100,
+      ),
+      Specialization(
+        specializationId: 2,
+        name: 'Cardiology',
+        image: 'https://cdn1.youmed.vn/tin-tuc/wp-content/uploads/2023/05/yhocduphong.png',
+        fees: 150,
+      ),
+      Specialization(
+        specializationId: 3,
+        name: 'Neurology',
+        image: 'https://cdn1.youmed.vn/tin-tuc/wp-content/uploads/2023/05/yhocduphong.png',
+        fees: 200,
+      ),
+    ];
   }
 
   @override

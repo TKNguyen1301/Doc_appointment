@@ -43,27 +43,27 @@ class DoctorCard extends StatelessWidget {
               ),
               child: AspectRatio(
                 aspectRatio: 1, // Ảnh hiển thị vuông
-                child: doctor.user?.avatar != null && doctor.user!.avatar.isNotEmpty
-                    ? Image.memory(
-                        Uri.parse(doctor.user!.avatar).data!.contentAsBytes(),
+                child: doctor.user?.avatar != null && doctor.user!.avatar!.isNotEmpty
+                    ? Image.network(
+                        doctor.user!.avatar!,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             color: Colors.grey[200],
-                            child: Icon(
+                            child: const Icon(
                               Icons.person,
-                              size: 48,
-                              color: Colors.grey[400],
+                              size: 50,
+                              color: Colors.grey,
                             ),
                           );
                         },
                       )
                     : Container(
                         color: Colors.grey[200],
-                        child: Icon(
+                        child: const Icon(
                           Icons.person,
-                          size: 48,
-                          color: Colors.grey[400],
+                          size: 50,
+                          color: Colors.grey,
                         ),
                       ),
               ),
@@ -76,95 +76,74 @@ class DoctorCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Dòng trạng thái "Available" (dựa vào doctorShifts)
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.circle,
-                          size: 12,
-                          color: _isAvailable() ? Colors.green : Colors.red,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          _isAvailable() ? 'Available' : 'Offline',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: _isAvailable() ? Colors.green[700] : Colors.red[700],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Tên bác sĩ (sử dụng username từ User model)
+                    // Tên bác sĩ
                     Text(
-                      '${doctor.degree} ${doctor.user?.username ?? 'Unknown Doctor'}',
-                      style: theme.textTheme.titleMedium?.copyWith(
+                      doctor.user?.username ?? 'Unknown Doctor',
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
+                        fontSize: 14,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-
-                    // Kinh nghiệm
-                    Text(
-                      '${doctor.experienceYears} năm kinh nghiệm',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey[600],
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-
+                    
                     // Chuyên khoa
                     Text(
                       doctor.specialization?.name ?? 'General',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey[700],
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 12,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-
+                    const SizedBox(height: 4),
+                    
                     // Rating
                     Row(
                       children: [
                         Icon(
                           Icons.star,
+                          color: Colors.amber,
                           size: 16,
-                          color: Colors.orange,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           doctor.rating.toStringAsFixed(1),
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[700],
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
                     ),
-
+                    const SizedBox(height: 4),
+                    
+                    // Experience
+                    Text(
+                      '${doctor.experienceYears} years exp.',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 11,
+                      ),
+                    ),
                     const Spacer(),
-
-                    // Nút "Book"
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: AppColors.primaryBackground,
-                          textStyle: const TextStyle(fontSize: 14),
-                          padding: const EdgeInsets.symmetric(vertical: 6),
+                    
+                    // Available status
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: _isAvailable() ? Colors.green : Colors.grey,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        _isAvailable() ? 'Available' : 'Busy',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
                         ),
-                        onPressed: () {
-                          Get.to(() => BookingPage(doctor: doctor));
-                        },
-                        child: const Text('Book'),
                       ),
                     ),
                   ],
