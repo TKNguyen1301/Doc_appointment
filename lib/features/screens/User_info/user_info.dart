@@ -1,17 +1,15 @@
-// account_pages.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutterproject/features/authentication/screens.onboarding/login/login.dart';
+import 'package:provider/provider.dart';
+import 'package:flutterproject/utils/constants/colors.dart';
+import 'package:flutterproject/features/patient/model/patient.dart';
+import 'package:flutterproject/features/patient/model_view/patient_controller.dart';
 import 'package:flutterproject/features/screens/User_info/change_password_page.dart';
 import 'package:flutterproject/features/screens/User_info/personal_info_page.dart';
-import 'package:flutterproject/features/screens/User_info/user_data.dart';
-
-
 
 /// Main account page
 class AccountPage extends StatelessWidget {
-  
-  AccountPage({Key? key}) : super(key: key);
+  const AccountPage({Key? key}) : super(key: key);
 
   void _showLogoutDialog(BuildContext context) {
     showDialog(
@@ -52,122 +50,133 @@ class AccountPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const borderRadius = BorderRadius.all(Radius.circular(16));
-    return Scaffold(
-      backgroundColor: const Color(0xFFF0F2F5),
-      body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 16),
-            // Header
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF6DD5FA), Color(0xFF2980B9)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: borderRadius,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.blue.withOpacity(0.2),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  )
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
-                    child: const CircleAvatar(
-                      radius: 30,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        currentUser.name,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
+    // Initialize provider to fetch patient profile for header data
+    return ChangeNotifierProvider(
+      create: (_) => PatientController()..fetchProfile(),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF0F2F5),
+        body: SafeArea(
+          child: Column(
+            children: [
+              const SizedBox(height: 16),
+              // Header with dynamic user info
+              Consumer<PatientController>(
+                builder: (context, controller, _) {
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF6DD5FA), Color(0xFF2980B9)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        currentUser.phone,
-                        style: const TextStyle(color: Colors.white70),
+                      borderRadius: borderRadius,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.blue.withOpacity(0.2),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        )
+                      ],
+                    ),
+                    child: controller.isLoading || controller.profile == null
+                        ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                        : Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white,
+                                ),
+                                child: CircleAvatar(
+                                  radius: 30,
+                                  backgroundImage: NetworkImage(controller.profile!.user?.avatar ?? ''),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    controller.profile!.user?.username ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    controller.profile!.phoneNumber ?? '',
+                                    style: const TextStyle(color: Colors.white70),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                  );
+                },
+              ),
+              const SizedBox(height: 24),
+              // Menu
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: borderRadius,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      )
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      _buildTile(
+                        icon: Icons.person,
+                        title: 'Thông tin cá nhân',
+                        color: Colors.blue,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const PersonalInfoPage(),
+                            ),
+                          );
+                        },
+                      ),
+                      const Divider(height: 1),
+                      _buildTile(
+                        icon: Icons.lock,
+                        title: 'Đổi mật khẩu',
+                        color: Colors.orange,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const ChangePasswordPage(),
+                            ),
+                          );
+                        },
+                      ),
+                      const Divider(height: 1),
+                      _buildTile(
+                        icon: Icons.logout,
+                        title: 'Đăng xuất',
+                        color: Colors.red,
+                        onTap: () => _showLogoutDialog(context),
                       ),
                     ],
-                  )
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            // Menu
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: borderRadius,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    )
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    _buildTile(
-                      icon: Icons.person,
-                      title: 'Thông tin cá nhân',
-                      color: Colors.blue,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => PersonalInfoPage(user: currentUser),
-                          ),
-                        );
-                      },
-                    ),
-                    const Divider(height: 1),
-                    _buildTile(
-                      icon: Icons.lock,
-                      title: 'Đổi mật khẩu',
-                      color: Colors.orange,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const ChangePasswordPage(),
-                          ),
-                        );
-                      },
-                    ),
-                    const Divider(height: 1),
-                    _buildTile(
-                      icon: Icons.logout,
-                      title: 'Đăng xuất',
-                      color: Colors.red,
-                      onTap: () => _showLogoutDialog(context),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -212,4 +221,3 @@ class AccountPage extends StatelessWidget {
     );
   }
 }
-

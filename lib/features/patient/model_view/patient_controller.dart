@@ -1,212 +1,234 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import '../model/patient.dart';
+import 'package:flutterproject/features/patient/model/patient.dart';
+import 'package:flutterproject/features/patient/model/user.dart';
+import 'package:flutterproject/features/patient/model/appointment.dart';
+import 'package:flutterproject/features/patient/model/payment.dart';
+import 'package:flutterproject/features/patient/model/doctor.dart';
 
-class PatientService {
-  final String baseUrl;
-  final http.Client _client;
+class PatientController extends ChangeNotifier {
+  // TODO: điều chỉnh baseUrl theo backend
+  final String _baseUrl = 'http://localhost:5001/api/patient';
 
-  PatientService({
-    this.baseUrl = 'http://localhost:5001/api',
-    http.Client? client,
-  }) : _client = client ?? http.Client();
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
-  Future<Patient> registerPatient({
-    required String username,
-    required String password,
-    required String email,
-  }) async {
-    final uri = Uri.parse('$baseUrl/patients/register');
-    final response = await _client.post(
-      uri,
-      headers: {HttpHeaders.contentTypeHeader: 'application/json'},
-      body: jsonEncode({
-        'username': username,
-        'password': password,
-        'email': email,
-      }),
-    );
-    if (response.statusCode == 201) {
-      return Patient.fromJson(jsonDecode(response.body));
-    }
-    throw HttpException('Failed to register patient: ${response.body}');
-  }
+  Patient? _profile;
+  Patient? get profile => _profile;
 
-  Future<bool> verifyEmail({
-    required String email,
-    required String otpCode,
-  }) async {
-    final uri = Uri.parse(
-      '$baseUrl/patients/verify?email=$email&otp_code=$otpCode',
-    );
-    final response = await _client.get(uri);
-    if (response.statusCode == 302) {
-      // redirected to login
-      return true;
-    }
-    if (response.statusCode == 400) {
-      return false;
-    }
-    throw HttpException('Email verification error: ${response.body}');
-  }
+  List<Appointment> _appointments = [];
+  List<Appointment> get appointments => _appointments;
 
-  Future<Map<String, dynamic>> loginPatient({
-    required String email,
-    required String password,
-  }) async {
-    final uri = Uri.parse('$baseUrl/patients/login');
-    final response = await _client.post(
-      uri,
-      headers: {HttpHeaders.contentTypeHeader: 'application/json'},
-      body: jsonEncode({
-        'email': email,
-        'password': password,
-      }),
-    );
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body) as Map<String, dynamic>;
-    }
-    throw HttpException('Failed to login: ${response.body}');
-  }
+  List<Payment> _payments = [];
+  List<Payment> get payments => _payments;
 
-  Future<void> changePassword({
-    required int userId,
-    required String oldPassword,
-    required String newPassword,
-  }) async {
-    final uri = Uri.parse('$baseUrl/patients/change-password');
-    final response = await _client.put(
-      uri,
-      headers: {HttpHeaders.contentTypeHeader: 'application/json'},
-      body: jsonEncode({
-        'old_password': oldPassword,
-        'new_password': newPassword,
-      }),
-    );
-    if (response.statusCode != 200) {
-      throw HttpException('Password change failed: ${response.body}');
+  Doctor? _doctorProfile;
+  Doctor? get doctorProfile => _doctorProfile;
+
+  List<Appointment> _doctorAppointments = [];
+  List<Appointment> get doctorAppointments => _doctorAppointments;
+
+  /// Đăng ký
+  Future<void> register(String username, String password, String email) async {
+    _setLoading(true);
+    try {
+      final uri = Uri.parse('$_baseUrl/register');
+      final res = await http.post(uri,
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode({'username': username, 'password': password, 'email': email}));
+      if (res.statusCode != 201) throw Exception('Đăng ký thất bại');
+    } finally {
+      _setLoading(false);
     }
   }
 
-  Future<List<Patient>> getAllPatients() async {
-    final uri = Uri.parse('$baseUrl/patients');
-    final response = await _client.get(uri);
-    if (response.statusCode == 200) {
-      final List decoded = jsonDecode(response.body);
-      return decoded.map((e) => Patient.fromJson(e)).toList();
+  /// Xác thực email
+  Future<void> verifyEmail(String email, String otpCode) async {
+    _setLoading(true);
+    try {
+      final uri = Uri.parse('$_baseUrl/verify')
+          .replace(queryParameters: {'email': email, 'otp_code': otpCode});
+      final res = await http.get(uri);
+      if (res.statusCode != 200) throw Exception('Xác thực thất bại');
+    } finally {
+      _setLoading(false);
     }
-    throw HttpException('Failed to fetch patients: ${response.body}');
   }
 
-  Future<Patient> getPatientProfile({required int userId}) async {
-    final uri = Uri.parse('$baseUrl/patients/profile');
-    final response = await _client.get(uri,
-      headers: {HttpHeaders.authorizationHeader: 'Bearer <token>'},
-    );
-    if (response.statusCode == 200) {
-      return Patient.fromJson(jsonDecode(response.body));
-    }
-    throw HttpException('Failed to fetch profile: ${response.body}');
-  }
-
-  Future<Patient> updatePatientProfile({
-    required int userId,
-    Map<String, dynamic>? data,
-    File? avatarFile,
-  }) async {
-    if (avatarFile != null) {
-      final uri = Uri.parse('$baseUrl/patients/profile');
-      final request = http.MultipartRequest('PUT', uri)
-        ..headers[HttpHeaders.authorizationHeader] = 'Bearer <token>'
-        ..fields.addAll(data?.map((k, v) => MapEntry(k, v.toString())) ?? {})
-        ..files.add(
-          await http.MultipartFile.fromPath(
-            'avatar',
-            avatarFile.path,
-            filename: avatarFile.path.split('/').last,
-          ),
-        );
-      final streamed = await request.send();
-      final res = await http.Response.fromStream(streamed);
+  /// Đăng nhập
+  Future<Map<String, dynamic>> login(String email, String password) async {
+    _setLoading(true);
+    try {
+      final uri = Uri.parse('$_baseUrl/login');
+      final res = await http.post(uri,
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode({'email': email, 'password': password}));
       if (res.statusCode == 200) {
-        return Patient.fromJson(jsonDecode(res.body));
+        return json.decode(res.body) as Map<String, dynamic>;
       }
-      throw HttpException('Profile update failed: ${res.body}');
-    } else {
-      final uri = Uri.parse('$baseUrl/patients/profile');
-      final response = await _client.put(
-        uri,
-        headers: {HttpHeaders.contentTypeHeader: 'application/json'},
-        body: jsonEncode(data),
-      );
-      if (response.statusCode == 200) {
-        return Patient.fromJson(jsonDecode(response.body));
+      throw Exception('Đăng nhập thất bại');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Đổi mật khẩu
+  Future<void> changePassword(String oldPassword, String newPassword) async {
+    _setLoading(true);
+    try {
+      final uri = Uri.parse('$_baseUrl/change_password');
+      final res = await http.post(uri,
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode({'oldPassword': oldPassword, 'newPassword': newPassword}));
+      if (res.statusCode != 200) throw Exception('Đổi mật khẩu thất bại');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Lấy profile hiện tại
+  Future<void> fetchProfile() async {
+    _setLoading(true);
+    try {
+      final uri = Uri.parse('$_baseUrl/profile');
+      final res = await http.get(uri);
+      if (res.statusCode == 200) {
+        final data = json.decode(res.body)['data'];
+        _profile = Patient.fromJson(data as Map<String, dynamic>);
+      } else {
+        throw Exception('Lấy profile thất bại');
       }
-      throw HttpException('Profile update failed: ${response.body}');
+    } finally {
+      _setLoading(false);
+      notifyListeners();
     }
   }
 
-  Future<List<dynamic>> getPatientAppointments({
-    required int userId,
-    Map<String, String>? queryParams,
-  }) async {
-    final uri = Uri.parse(
-      '$baseUrl/patients/appointments'
-      '${queryParams != null ? '?' + Uri(queryParameters: queryParams).query : ''}',
-    );
-    final response = await _client.get(uri);
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body) as List;
+  /// Cập nhật profile (có avatar)
+  Future<void> updateProfile(Map<String, String> fields, {File? avatar}) async {
+    _setLoading(true);
+    try {
+      final uri = Uri.parse('$_baseUrl/update');
+      if (avatar != null) {
+        final req = http.MultipartRequest('PATCH', uri);
+        req.files.add(await http.MultipartFile.fromPath('avatar', avatar.path));
+        req.fields.addAll(fields);
+        final streamed = await req.send();
+        final res = await http.Response.fromStream(streamed);
+        if (res.statusCode == 200) {
+          final data = json.decode(res.body)['data'];
+          _profile = Patient.fromJson(data as Map<String, dynamic>);
+        } else {
+          throw Exception('Cập nhật thất bại');
+        }
+      } else {
+        final res = await http.patch(uri,
+            headers: {'Content-Type': 'application/json'}, body: json.encode(fields));
+        if (res.statusCode == 200) {
+          final data = json.decode(res.body)['data'];
+          _profile = Patient.fromJson(data as Map<String, dynamic>);
+        } else {
+          throw Exception('Cập nhật thất bại');
+        }
+      }
+    } finally {
+      _setLoading(false);
+      notifyListeners();
     }
-    throw HttpException('Failed to load appointments: ${response.body}');
   }
 
-  Future<List<dynamic>> getPatientPayments({
-    required int userId,
-    Map<String, String>? queryParams,
-  }) async {
-    final uri = Uri.parse(
-      '$baseUrl/patients/payments'
-      '${queryParams != null ? '?' + Uri(queryParameters: queryParams).query : ''}',
-    );
-    final response = await _client.get(uri);
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body) as List;
+  /// Lấy lịch khám
+  Future<void> fetchAppointments({Map<String, String>? queryParams}) async {
+    _setLoading(true);
+    try {
+      final uri = Uri.parse('$_baseUrl/appointments').replace(queryParameters: queryParams);
+      final res = await http.get(uri);
+      if (res.statusCode == 200) {
+        final list = json.decode(res.body)['data'] as List;
+        _appointments = list.map((e) => Appointment.fromJson(e as Map<String, dynamic>)).toList();
+      } else {
+        throw Exception('Lấy lịch thất bại');
+      }
+    } finally {
+      _setLoading(false);
+      notifyListeners();
     }
-    throw HttpException('Failed to load payments: ${response.body}');
   }
 
-  Future<Map<String, dynamic>> getDoctorProfileByPatient({
-    required int doctorUserId,
-  }) async {
-    final uri = Uri.parse('$baseUrl/patients/$doctorUserId/doctor-profile');
-    final response = await _client.get(uri);
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body) as Map<String, dynamic>;
+  /// Lấy thanh toán
+  Future<void> fetchPayments({Map<String, String>? queryParams}) async {
+    _setLoading(true);
+    try {
+      final uri = Uri.parse('$_baseUrl/payments').replace(queryParameters: queryParams);
+      final res = await http.get(uri);
+      if (res.statusCode == 200) {
+        final list = json.decode(res.body)['data'] as List;
+        _payments = list.map((e) => Payment.fromJson(e as Map<String, dynamic>)).toList();
+      } else {
+        throw Exception('Lấy thanh toán thất bại');
+      }
+    } finally {
+      _setLoading(false);
+      notifyListeners();
     }
-    throw HttpException('Failed to load doctor profile: ${response.body}');
   }
 
-  Future<List<dynamic>> getDoctorAppointmentsByPatient({
-    required int doctorUserId,
-  }) async {
-    final uri = Uri.parse('$baseUrl/patients/$doctorUserId/doctor-appointments');
-    final response = await _client.get(uri);
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body) as List;
+  /// Lấy profile bác sĩ
+  Future<void> fetchDoctorProfile(int userId) async {
+    _setLoading(true);
+    try {
+      final uri = Uri.parse('$_baseUrl/doctor_profile/$userId');
+      final res = await http.get(uri);
+      if (res.statusCode == 200) {
+        final data = json.decode(res.body)['data'];
+        _doctorProfile = Doctor.fromJson(data as Map<String, dynamic>);
+      } else {
+        throw Exception('Lấy bác sĩ thất bại');
+      }
+    } finally {
+      _setLoading(false);
+      notifyListeners();
     }
-    throw HttpException('Failed to load doctor appointments: ${response.body}');
   }
 
-  Future<Map<String, dynamic>> getPaymentById({
-    required int paymentId,
-  }) async {
-    final uri = Uri.parse('$baseUrl/patients/payments/$paymentId');
-    final response = await _client.get(uri);
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body) as Map<String, dynamic>;
+  /// Lấy lịch của bác sĩ
+  Future<void> fetchDoctorAppointments(int userId) async {
+    _setLoading(true);
+    try {
+      final uri = Uri.parse('$_baseUrl/doctor_appointments/$userId');
+      final res = await http.get(uri);
+      if (res.statusCode == 200) {
+        final list = json.decode(res.body)['data'] as List;
+        _doctorAppointments = list.map((e) => Appointment.fromJson(e as Map<String, dynamic>)).toList();
+      } else {
+        throw Exception('Lấy lịch bác sĩ thất bại');
+      }
+    } finally {
+      _setLoading(false);
+      notifyListeners();
     }
-    throw HttpException('Failed to load payment: ${response.body}');
+  }
+
+  /// Lấy chi tiết thanh toán
+  Future<Payment> fetchPaymentById(int paymentId) async {
+    _setLoading(true);
+    try {
+      final uri = Uri.parse('$_baseUrl/payments/$paymentId');
+      final res = await http.get(uri);
+      if (res.statusCode == 200) {
+        final data = json.decode(res.body)['data'];
+        return Payment.fromJson(data as Map<String, dynamic>);
+      }
+      throw Exception('Lấy chi tiết thất bại');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
   }
 }
