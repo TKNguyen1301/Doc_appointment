@@ -82,7 +82,96 @@ class ConfirmationPage extends StatelessWidget {
           // ====== Phần indicator bước (nếu có) ======
           // ... Nếu bạn có indicator "1 – 2 – 3" thì giữ nguyên ...
           // Hoặc bỏ qua nếu không cần.
-
+          // ---------- Phần indicator bước (bắt chước giao diện ở ảnh) ----------
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  // Bước 1: Chọn lịch khám (đã hoàn thành)
+                  Row(
+                    children: [
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.green.shade400,
+                        ),
+                        alignment: Alignment.center,
+                        child: const Icon(Icons.check, size: 16, color: Colors.white),
+                      ),
+                      const SizedBox(width: 6),
+                      const Text(
+                        'Chọn lịch khám',
+                        style: TextStyle(fontSize: 13, color: Colors.green),
+                      ),
+                    ],
+                  ),
+              
+                  // Mũi tên
+                  const SizedBox(width: 8),
+                  Icon(Icons.chevron_right, color: Colors.grey.shade400),
+              
+                  // Bước 2: Xác nhận (đang active)
+                  const SizedBox(width: 8),
+                  Row(
+                    children: [
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.blue,
+                        ),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          '2',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      const Text(
+                        'Xác nhận',
+                        style: TextStyle(fontSize: 13, color: Colors.blue),
+                      ),
+                    ],
+                  ),
+              
+                  // Mũi tên tiếp theo (chưa đến)
+                  const SizedBox(width: 8),
+                  Icon(Icons.chevron_right, color: Colors.grey.shade400),
+              
+                  // Bước 3: Nhận lịch (chưa hoàn thành)
+                  const SizedBox(width: 8),
+                  Row(
+                    children: [
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.grey.shade300,
+                        ),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          '3',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Nhận lịch hẹn',
+                        style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
           // ====== Phần nội dung chính ======
           Expanded(
             child: SingleChildScrollView(
