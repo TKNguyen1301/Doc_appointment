@@ -1,4 +1,4 @@
-import 'user.dart';
+import '../../authentication/model/user.dart';
 import 'specialization.dart';
 import 'doctor_shift.dart';
 import 'appointment.dart';
