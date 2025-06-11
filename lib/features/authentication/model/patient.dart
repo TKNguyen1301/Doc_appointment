@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'user.dart';
-import 'appointment.dart';
-import 'medicalrecord.dart';
-import 'prescription.dart';
-import 'feedback.dart';
-import 'payment.dart';
+import '../../patient/model/appointment.dart';
+import '../../patient/model/medicalrecord.dart';
+import '../../patient/model/prescription.dart';
+import '../../patient/model/feedback.dart';
+import '../../patient/model/payment.dart';
 
 enum Gender { male, female, other }
 
@@ -55,7 +55,7 @@ class Patient {
             : null,
         gender: json['gender'] != null
             ? Gender.values.firstWhere(
-                (g) => describeEnum(g) == json['gender'],
+                (e) => e.toString().split('.').last == json['gender'],
                 orElse: () => Gender.other,
               )
             : null,

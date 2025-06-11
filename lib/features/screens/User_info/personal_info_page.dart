@@ -4,26 +4,33 @@ import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:flutterproject/utils/constants/colors.dart';
-import 'package:flutterproject/features/patient/model/patient.dart';
-import 'package:flutterproject/features/patient/model_view/patient_controller.dart';
+import 'package:flutterproject/features/authentication/model/patient.dart';
+import 'package:flutterproject/features/authentication/model_view/patient_controller.dart';
 import 'package:flutterproject/features/screens/User_info/edit_profile_page.dart';
 
-class PersonalInfoPage extends StatelessWidget {
+class PersonalInfoPage extends StatefulWidget {
   const PersonalInfoPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => PatientController()..fetchProfile(),
-      child: _PersonalInfoView(), // removed const to allow rebuilds
-    );
-  }
+  State<PersonalInfoPage> createState() => _PersonalInfoPageState();
 }
 
-class _PersonalInfoView extends StatelessWidget {
+class _PersonalInfoPageState extends State<PersonalInfoPage> {
+  @override
+  void initState() {
+    super.initState();
+    // Ensure profile is loaded
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = Provider.of<PatientController>(context, listen: false);
+      if (controller.profile == null && !controller.isLoading) {
+        controller.fetchProfile();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<PatientController>(context);
+    // Sử dụng provider đã có thay vì tạo mới
     return Scaffold(
       backgroundColor: const Color(0xfff0f4ff),
       appBar: AppBar(
@@ -33,16 +40,35 @@ class _PersonalInfoView extends StatelessWidget {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      body: controller.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _buildProfile(context, controller.profile),
+      body: Consumer<PatientController>(
+        builder: (context, controller, child) {
+          if (controller.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          
+          if (controller.profile == null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Không thể tải thông tin cá nhân'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => controller.fetchProfile(),
+                    child: const Text('Thử lại'),
+                  ),
+                ],
+              ),
+            );
+          }
+          
+          return _buildProfile(context, controller.profile!);
+        },
+      ),
     );
   }
 
-  Widget _buildProfile(BuildContext context, Patient? profile) {
-    if (profile == null) {
-      return const Center(child: Text('Không thể tải thông tin cá nhân'));
-    }
+  Widget _buildProfile(BuildContext context, Patient profile) {
     final user = profile.user;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
@@ -68,14 +94,13 @@ class _PersonalInfoView extends StatelessWidget {
               ),
               TextButton.icon(
                 onPressed: () {
-                  if (user != null) {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (_) => EditProfilePage(user: user),
-                    //   ),
-                    // );
-                  }
+                  // Navigate to edit page if needed
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => EditProfilePage(),
+                  //   ),
+                  // );
                 },
                 icon: const Icon(Icons.edit, size: 18),
                 label: const Text('Điều chỉnh', style: TextStyle(fontSize: 15)),
@@ -92,12 +117,13 @@ class _PersonalInfoView extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               child: Column(
                 children: [
-                  _buildRow('🆔 Mã bệnh nhân', profile.patientId.toString(), true),
-                  _buildRow('🏥 Mã BHYT', profile.insuranceNumber ?? 'Chưa cập nhật', true),
-                  _buildRow('📄 CCCD', profile.idNumber ?? 'Chưa cập nhật', true),
-                  _buildRow('👤 Tên đăng nhập', user?.username ?? 'Chưa cập nhật', false),
-                  _buildRow('📞 SĐT', profile.phoneNumber ?? 'Chưa cập nhật', false),
+                  _buildRow(context, '🆔 Mã bệnh nhân', profile.patientId.toString(), true),
+                  _buildRow(context, '🏥 Mã BHYT', profile.insuranceNumber ?? 'Chưa cập nhật', true),
+                  _buildRow(context, '📄 CCCD', profile.idNumber ?? 'Chưa cập nhật', true),
+                  _buildRow(context, '👤 Tên đăng nhập', user?.username ?? 'Chưa cập nhật', false),
+                  _buildRow(context, '📞 SĐT', profile.phoneNumber ?? 'Chưa cập nhật', false),
                   _buildRow(
+                    context,
                     '🎂 Ngày sinh',
                     profile.dateOfBirth != null
                         ? DateFormat('dd/MM/yyyy').format(profile.dateOfBirth!)
@@ -105,14 +131,15 @@ class _PersonalInfoView extends StatelessWidget {
                     false,
                   ),
                   _buildRow(
+                    context,
                     '⚧ Giới tính',
                     profile.gender != null
                         ? describeEnum(profile.gender!)
                         : 'Chưa cập nhật',
                     false,
                   ),
-                  _buildRow('🏠 Địa chỉ', profile.address ?? 'Chưa cập nhật', false),
-                  _buildRow('📧 Email', user?.email ?? 'Chưa cập nhật', false),
+                  _buildRow(context, '🏠 Địa chỉ', profile.address ?? 'Chưa cập nhật', false),
+                  _buildRow(context, '📧 Email', user?.email ?? 'Chưa cập nhật', false),
                 ],
               ),
             ),
@@ -122,7 +149,7 @@ class _PersonalInfoView extends StatelessWidget {
     );
   }
 
-  Widget _buildRow(String label, String value, bool copyable) {
+  Widget _buildRow(BuildContext context, String label, String value, bool copyable) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
@@ -145,8 +172,8 @@ class _PersonalInfoView extends StatelessWidget {
               icon: const Icon(Icons.copy, size: 18, color: Colors.grey),
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: value));
-                // ScaffoldMessenger.of(context)
-                //     .showSnackBar(const SnackBar(content: Text('📋 Đã sao chép')));
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(const SnackBar(content: Text('📋 Đã sao chép')));
               },
             ),
         ],

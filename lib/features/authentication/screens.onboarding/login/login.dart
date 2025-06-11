@@ -7,7 +7,7 @@ import 'package:flutterproject/utils/constants/colors.dart';
 import 'package:flutterproject/utils/constants/image_strings.dart';
 import 'package:flutterproject/utils/constants/text_strings.dart';
 import 'package:flutterproject/utils/helpers/helper_functions.dart';
-import 'package:flutterproject/features/patient/model_view/patient_controller.dart';
+import 'package:flutterproject/features/authentication/model_view/patient_controller.dart';
 import 'package:get/get.dart';
 import 'package:get/get_utils/src/extensions/string_extensions.dart';
 import 'package:iconsax/iconsax.dart';

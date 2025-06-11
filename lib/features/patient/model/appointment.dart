@@ -1,4 +1,4 @@
-import 'patient.dart';
+import '../../authentication/model/patient.dart';
 import 'doctor.dart';
 import 'feedback.dart';
 import 'prescription.dart';
