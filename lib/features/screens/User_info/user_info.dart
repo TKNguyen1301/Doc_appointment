@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterproject/features/authentication/screens.onboarding/login/login.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:flutterproject/utils/constants/colors.dart';
 import 'package:flutterproject/features/authentication/model/patient.dart';
@@ -34,11 +35,16 @@ class _AccountPageState extends State<AccountPage> {
   Widget build(BuildContext context) {
     const borderRadius = BorderRadius.all(Radius.circular(16));
     
-    // Sử dụng provider đã có thay vì tạo mới
     return Scaffold(
       backgroundColor: const Color(0xFFF0F2F5),
       body: Consumer<PatientController>(
         builder: (context, patientController, child) {
+          // Nếu chưa đăng nhập, hiển thị trang đăng nhập
+          if (patientController.profile == null) {
+            return _buildLoginPrompt(context);
+          }
+          
+          // Nếu đã đăng nhập, hiển thị thông tin user
           return SingleChildScrollView(
             child: Column(
               children: [
@@ -168,6 +174,66 @@ class _AccountPageState extends State<AccountPage> {
     );
   }
 
+  Widget _buildLoginPrompt(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.account_circle_outlined,
+              size: 100,
+              color: Colors.grey,
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'Chưa đăng nhập',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Đăng nhập để truy cập thông tin cá nhân và các tính năng khác',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: () {
+                  Get.to(() => const LoginScreen());
+                },
+                child: const Text(
+                  'Đăng nhập / Đăng ký',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildTile({
     required IconData icon,
     required String title,
@@ -232,13 +298,11 @@ class _AccountPageState extends State<AccountPage> {
               if (widget.onLogout != null) {
                 widget.onLogout!();
               } else {
-                // Fallback logout logic
+                // Fallback logout logic - chỉ logout, không navigate
                 final patientController = Provider.of<PatientController>(context, listen: false);
                 await patientController.logout();
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                  (route) => false,
-                );
+                
+                // Show success message
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Đã đăng xuất')),
                 );

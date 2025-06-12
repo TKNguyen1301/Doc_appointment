@@ -1,4 +1,4 @@
-import 'appointment.dart';
+import '../../booking/model/appointment.dart';
 
 class Feedback {
   final int feedbackId;

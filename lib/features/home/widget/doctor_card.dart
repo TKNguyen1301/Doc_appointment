@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutterproject/features/booking/booking_page.dart';
+import 'package:flutterproject/features/booking/view/booking_page.dart';
 import 'package:flutterproject/features/home/model/doctor.dart';
 import 'package:flutterproject/utils/constants/colors.dart';
 import 'package:get/get.dart';
@@ -13,14 +13,30 @@ class DoctorCard extends StatelessWidget {
     required this.doctor,
   }) : super(key: key);
 
+  // Thêm method để tính fee display
+  int get _displayFee {
+    if (doctor.specialization?.fees != null && doctor.specialization!.fees > 0) {
+      return doctor.specialization!.fees;
+    }
+    return 0;
+  }
+
+  String get _formattedFee {
+    if (_displayFee == 0) return 'Liên hệ';
+    return '${_displayFee.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} đ';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: () {
-        // TODO: Chuyển tới trang chi tiết bác sĩ
+        // Navigate to booking page with doctor ID
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => BookingPage(doctorId: doctor.doctorId),
+          ),
+        );
       },
       child: Container(
         decoration: BoxDecoration(
@@ -72,7 +88,7 @@ class DoctorCard extends StatelessWidget {
             // Nội dung bên dưới ảnh
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                padding: const EdgeInsets.all(12.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -80,8 +96,9 @@ class DoctorCard extends StatelessWidget {
                     Text(
                       doctor.user?.username ?? 'Unknown Doctor',
                       style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -92,13 +109,13 @@ class DoctorCard extends StatelessWidget {
                     Text(
                       doctor.specialization?.name ?? 'General',
                       style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 12,
+                        fontSize: 13,
+                        color: Colors.grey.shade600,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 8),
                     
                     // Rating
                     Row(
@@ -130,21 +147,24 @@ class DoctorCard extends StatelessWidget {
                     ),
                     const Spacer(),
                     
-                    // Available status
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: _isAvailable() ? Colors.green : Colors.grey,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        _isAvailable() ? 'Available' : 'Busy',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
+                    // Fee display
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.monetization_on,
+                          size: 16,
+                          color: Colors.green.shade600,
                         ),
-                      ),
+                        const SizedBox(width: 4),
+                        Text(
+                          _formattedFee,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.green.shade700,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -153,20 +173,6 @@ class DoctorCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  // Helper method để check available dựa vào doctor shifts
-  bool _isAvailable() {
-    if (doctor.doctorShifts == null || doctor.doctorShifts!.isEmpty) {
-      return false;
-    }
-    
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    
-    return doctor.doctorShifts!.any((shift) => 
-      shift.shiftDate.isAtSameMomentAs(today) || shift.shiftDate.isAfter(today)
     );
   }
 }

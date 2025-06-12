@@ -5,8 +5,6 @@ import 'package:flutterproject/features/home/view_model/specialization_controlle
 import 'package:flutterproject/features/home/model/specialization.dart';
 import 'package:get/get.dart';
 import '../../search_page/view/search_doctor.dart';
-import '../../authentication/model_view/patient_controller.dart';
-import '../../home/view_model/doctor_controller.dart';
 
 class FindBySpecialitySection extends StatefulWidget {
   const FindBySpecialitySection({super.key});
@@ -16,8 +14,7 @@ class FindBySpecialitySection extends StatefulWidget {
 }
 
 class _FindBySpecialitySectionState extends State<FindBySpecialitySection> {
-  final DoctorController _doctorController = DoctorController();
-  final PatientController _patientController = PatientController();
+  final SpecializationService _specializationService = SpecializationService();
   List<Specialization> specializations = [];
   bool isLoading = true;
   String? error;
@@ -25,32 +22,21 @@ class _FindBySpecialitySectionState extends State<FindBySpecialitySection> {
   @override
   void initState() {
     super.initState();
-    _loadSpecializationsFromDoctors();
+    _loadSpecializations();
   }
 
-  Future<void> _loadSpecializationsFromDoctors() async {
+  Future<void> _loadSpecializations() async {
     try {
       setState(() {
         isLoading = true;
         error = null;
       });
       
-      await _patientController.isAuthenticated();
-      final token = _patientController.token;
-      
-      // Get doctors data which contains specialization info
-      final doctors = await _doctorController.fetchAllDoctors(token: token);
-      
-      // Extract unique specializations from doctors
-      final specializationMap = <int, Specialization>{};
-      for (final doctor in doctors) {
-        if (doctor.specialization != null) {
-          specializationMap[doctor.specialization!.specializationId] = doctor.specialization!;
-        }
-      }
+      // Use the public endpoint that doesn't require authentication
+      final fetchedSpecializations = await _specializationService.getAllSpecializations();
       
       setState(() {
-        specializations = specializationMap.values.toList();
+        specializations = fetchedSpecializations;
         isLoading = false;
       });
     } catch (e) {
@@ -58,11 +44,12 @@ class _FindBySpecialitySectionState extends State<FindBySpecialitySection> {
         error = e.toString();
         isLoading = false;
         
+        // Fallback specializations if API fails
         specializations = _createFallbackSpecializations();
       });
       
       if (kDebugMode) {
-        print('Error loading specializations from doctors: $e');
+        print('Error loading specializations: $e');
       }
     }
   }
@@ -126,7 +113,7 @@ class _FindBySpecialitySectionState extends State<FindBySpecialitySection> {
                     Text('Error: $error'),
                     const SizedBox(height: 8),
                     ElevatedButton(
-                      onPressed: _loadSpecializationsFromDoctors,
+                      onPressed: _loadSpecializations,
                       child: const Text('Retry'),
                     ),
                   ],

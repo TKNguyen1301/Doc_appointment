@@ -1,4 +1,4 @@
-import 'appointment.dart';
+import '../../booking/model/appointment.dart';
 
 class MedicalRecord {
   final int recordId;

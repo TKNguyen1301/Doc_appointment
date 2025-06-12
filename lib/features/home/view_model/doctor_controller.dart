@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutterproject/features/home/model/doctor.dart';
-import 'package:flutterproject/features/patient/model/appointment.dart';
+import 'package:flutterproject/features/booking/model/appointment.dart';
 import 'package:flutterproject/features/patient/model/feedback.dart';
 
 /// Controller for interacting with Doctor-related API endpoints.
