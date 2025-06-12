@@ -45,6 +45,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/logos/
-    - assets/images/
+    - assets/images/carousel/
+    - assets/images/on_boarding_images/
     - assets/assets_frontend/
     

@@ -1,7 +1,7 @@
 import '../../authentication/model/user.dart';
 import 'specialization.dart';
 import 'doctor_shift.dart';
-import '../../patient/model/appointment.dart';
+import '../../booking/model/appointment.dart';
 
 class Doctor {
   final int doctorId;

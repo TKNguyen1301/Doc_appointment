@@ -57,8 +57,9 @@ class NavigationController extends GetxController {
     try {
       await patientController.logout();
       
-      // Navigate to login screen và clear navigation stack
-      Get.offAll(() => const LoginScreen());
+      // Chuyển về tab Home thay vì navigate to login screen
+      final navigationController = Get.find<NavigationController>();
+      navigationController.selectedIndex.value = 0; // Chuyển về tab Home
       
       // Show success message
       Get.snackbar(

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'user.dart';
-import '../../patient/model/appointment.dart';
+import '../../booking/model/appointment.dart';
 import '../../patient/model/medicalrecord.dart';
 import '../../patient/model/prescription.dart';
 import '../../patient/model/feedback.dart';

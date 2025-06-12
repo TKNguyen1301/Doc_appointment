@@ -46,7 +46,7 @@
 		</data>
 		<key>Frameworks/App.framework/App</key>
 		<data>
-		2gvX2L+LaU7GLQXjypbSdhOgcgk=
+		XHMiomMrdMAodCuy5EULr9pufRg=
 		</data>
 		<key>Frameworks/App.framework/Info.plist</key>
 		<data>
@@ -54,15 +54,15 @@
 		</data>
 		<key>Frameworks/App.framework/_CodeSignature/CodeResources</key>
 		<data>
-		Faeqy7O7azdTW0dm5gQVpVnE1nA=
+		nUB6j0QwK5n0p3nI5amWAByZ0oM=
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/AssetManifest.bin</key>
 		<data>
-		g3/xE8doDdQbN/zWNs8Vm+nNJL4=
+		IPcgtS6UTKgqW7GPWrcrcDE2O0o=
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/AssetManifest.json</key>
 		<data>
-		FwCaEylcsrV6ZWn4UUVC673Lwys=
+		lE8veqi7/e7Lb1OafBWnEBqZ0JI=
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/FontManifest.json</key>
 		<data>
@@ -236,30 +236,6 @@
 		<data>
 		FdAvu0RW3uePgWcF70ws2GsK7uA=
 		</data>
-		<key>Frameworks/App.framework/flutter_assets/assets/images/on_boarding_images/Remove-bg.ai_1729582152316.png</key>
-		<data>
-		RHYwqHrNx/6oPKsZDjJOfNXPld8=
-		</data>
-		<key>Frameworks/App.framework/flutter_assets/assets/images/on_boarding_images/Remove-bg.ai_1729582178858.png</key>
-		<data>
-		3e2Nbj5PpZy17GMKfO5d6FVIZvo=
-		</data>
-		<key>Frameworks/App.framework/flutter_assets/assets/images/on_boarding_images/sammy-basketball-ball-and-training-equipment.gif</key>
-		<data>
-		K5laXEi+ULc8GWjWr8Uu8f0bZFs=
-		</data>
-		<key>Frameworks/App.framework/flutter_assets/assets/images/on_boarding_images/sammy-medical-insurance-clipboard-with-coins.gif</key>
-		<data>
-		+B+OnRVH7xbKLAOVO1tGMTGQHws=
-		</data>
-		<key>Frameworks/App.framework/flutter_assets/assets/images/on_boarding_images/sammy-service-support.gif</key>
-		<data>
-		5jY824V5BQkDUMtBGOPv3KgM2SQ=
-		</data>
-		<key>Frameworks/App.framework/flutter_assets/assets/images/on_boarding_images/snapedit_1729954779426.png</key>
-		<data>
-		C10CcuahN8UBRqGN6VmfH8U197g=
-		</data>
 		<key>Frameworks/App.framework/flutter_assets/assets/logos/Remove-bg.ai_1729751552430.png</key>
 		<data>
 		xbSTqhjccfbYwZx4pSxm1uECDts=
@@ -298,7 +274,7 @@
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/kernel_blob.bin</key>
 		<data>
-		fj1+yPkJQ/ymxQMVpB8BZGbcRZM=
+		pvKmDO2rq6X4IwxQWGPssduVVpk=
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>
 		<data>
@@ -1061,7 +1037,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			lh+qCtymuH9jt2NuS2oh1pVTTEhzOqFOA18l4G5H69o=
+			2LHsna5EsyQz/CSnhKqnteiZitcDp9PFxIYocHzZko0=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/Info.plist</key>
@@ -1075,21 +1051,21 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			YDiNDmb1s8W+j6MxfMiLbJIJ9VQhSKHsyPqfTTdE8is=
+			KzJFyaY1Sx8uCicEWnnrH7T9eSQ+LYC0RfKe0dRZESI=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/flutter_assets/AssetManifest.bin</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			EUit4NPsMUILNt324yky8eyuVPViMWrMYXfHUAJZwnw=
+			12/6Nnv8XdvAYHuUHP9GzCjmyZTic6Vmyeo0WdbfW+k=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/flutter_assets/AssetManifest.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			x5uTQYSY2OSb7D3uEVEDnnvuvwubpuHaHMeF4Axx7PM=
+			K1vcaic2snIuPDgESAhcLgJXc9GergBncnM5ioMz6ss=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/flutter_assets/FontManifest.json</key>
@@ -1393,48 +1369,6 @@
 			CZ5gi/1wqgoTagfGmAZX+lycAm2wHAK9aWi4WoalpPA=
 			</data>
 		</dict>
-		<key>Frameworks/App.framework/flutter_assets/assets/images/on_boarding_images/Remove-bg.ai_1729582152316.png</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			MDLeOe4HQ5ZtND70jscNP22uc6+kj5s0Dh4dAjX1h9o=
-			</data>
-		</dict>
-		<key>Frameworks/App.framework/flutter_assets/assets/images/on_boarding_images/Remove-bg.ai_1729582178858.png</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			FlQ9ZWtY+2jdm5N/dnA4kjd0lQH20Ct8bm/oF7KZNVM=
-			</data>
-		</dict>
-		<key>Frameworks/App.framework/flutter_assets/assets/images/on_boarding_images/sammy-basketball-ball-and-training-equipment.gif</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			336wjxrTj1ng1bs0LEheGd/2vjK0uENi2GjZ7ejifY0=
-			</data>
-		</dict>
-		<key>Frameworks/App.framework/flutter_assets/assets/images/on_boarding_images/sammy-medical-insurance-clipboard-with-coins.gif</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			y0GPUaSkplnZd3R8MznfmDw/pDtfOVcgwOk+16+vfl8=
-			</data>
-		</dict>
-		<key>Frameworks/App.framework/flutter_assets/assets/images/on_boarding_images/sammy-service-support.gif</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			N84zt1gy/hPcSHx5wsfqCkWoPpkbxbAIfnlad9MYM2U=
-			</data>
-		</dict>
-		<key>Frameworks/App.framework/flutter_assets/assets/images/on_boarding_images/snapedit_1729954779426.png</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			ZiqJm+bdvWoECq91kUE2fs2jk6EOy97tOayTumaWkH0=
-			</data>
-		</dict>
 		<key>Frameworks/App.framework/flutter_assets/assets/logos/Remove-bg.ai_1729751552430.png</key>
 		<dict>
 			<key>hash2</key>
@@ -1502,7 +1436,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			ZOPoaq15cL0klkLnFXYdvSxgidcXY4zsnDC3xtO7MY0=
+			fFTfmtmo04ta8Qm+CuU828q6iirqn2Ar5y5i3bBBHNY=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>

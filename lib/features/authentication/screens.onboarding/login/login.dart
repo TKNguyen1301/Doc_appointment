@@ -11,6 +11,7 @@ import 'package:flutterproject/features/authentication/model_view/patient_contro
 import 'package:get/get.dart';
 import 'package:get/get_utils/src/extensions/string_extensions.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:provider/provider.dart'; // Add this import
 import '../../../../utils/constants/sizes.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -24,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final PatientController _patientController = Get.put(PatientController());
+  // Remove this line: final PatientController _patientController = Get.put(PatientController());
   bool _isLoading = false;
   bool _obscurePassword = true;
 
@@ -32,11 +33,30 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
     try {
-      await _patientController.login(
+      // Use Provider instead of Get
+      final patientController = Provider.of<PatientController>(context, listen: false);
+      
+      await patientController.login(
         _emailController.text.trim(),
         _passwordController.text,
       );
-      Get.offAll(() => const NavigationMenu());
+
+      // Fetch profile after successful login
+      await patientController.fetchProfile();
+
+      // Navigate back or to navigation menu
+      if (Navigator.canPop(context)) {
+        Get.back(); // Quay về trang trước
+      } else {
+        Get.offAll(() => const NavigationMenu());
+      }
+
+      Get.snackbar(
+        'Thành công',
+        'Đăng nhập thành công!',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.withOpacity(0.1),
+      );
     } catch (e) {
       Get.snackbar(
         'Đăng nhập thất bại',

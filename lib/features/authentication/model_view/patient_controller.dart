@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutterproject/features/authentication/model/patient.dart';
 import 'package:flutterproject/features/authentication/model/user.dart';
-import 'package:flutterproject/features/patient/model/appointment.dart';
+import 'package:flutterproject/features/booking/model/appointment.dart';
 import 'package:flutterproject/features/patient/model/payment.dart';
 import 'package:flutterproject/features/home/model/doctor.dart';
 

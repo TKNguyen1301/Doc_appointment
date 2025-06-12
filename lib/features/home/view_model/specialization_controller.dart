@@ -13,17 +13,13 @@ class SpecializationService {
     http.Client? client,
   }) : _client = client ?? http.Client();
 
-  /// Fetch all specializations
+  /// Fetch all specializations (public endpoint - no auth required)
   Future<List<Specialization>> getAllSpecializations({String? token}) async {
-    final uri = Uri.parse(baseUrl);
+    final uri = Uri.parse('$baseUrl/all'); // Use the /all endpoint
     
     try {
-      Map<String, String> headers = {};
-      if (token != null) {
-        headers[HttpHeaders.authorizationHeader] = 'Bearer $token';
-      }
-      
-      final response = await _client.get(uri, headers: headers);
+      // No authentication headers needed for public endpoint
+      final response = await _client.get(uri);
       
       if (response.statusCode == 200) {
         if (kDebugMode) {
@@ -32,31 +28,11 @@ class SpecializationService {
         
         final dynamic responseBody = jsonDecode(response.body);
         
-        // Handle different response formats
-        if (responseBody is List) {
-          // Direct list response
-          return responseBody.map((e) => Specialization.fromJson(e as Map<String, dynamic>)).toList();
-        } else if (responseBody is Map<String, dynamic>) {
-          // Object response - check various possible keys
-          List? specializationsList;
-          
-          if (responseBody.containsKey('data')) {
-            specializationsList = responseBody['data'] as List?;
-          } else if (responseBody.containsKey('specializations')) {
-            specializationsList = responseBody['specializations'] as List?;
-          } else if (responseBody.containsKey('result')) {
-            specializationsList = responseBody['result'] as List?;
-          } else if (responseBody.containsKey('items')) {
-            specializationsList = responseBody['items'] as List?;
-          }
-          
-          if (specializationsList != null) {
+        // Based on your backend, the response format is: { message: "Success", specializations: [...] }
+        if (responseBody is Map<String, dynamic>) {
+          if (responseBody.containsKey('specializations')) {
+            final List specializationsList = responseBody['specializations'] as List;
             return specializationsList.map((e) => Specialization.fromJson(e as Map<String, dynamic>)).toList();
-          } else {
-            // If it's a single specialization object, wrap in list
-            if (responseBody.containsKey('specialization_id') || responseBody.containsKey('id')) {
-              return [Specialization.fromJson(responseBody)];
-            }
           }
         }
         
@@ -66,16 +42,6 @@ class SpecializationService {
         }
         return <Specialization>[];
         
-      } else if (response.statusCode == 401) {
-        // Authentication error - try without token for public endpoints
-        if (token != null) {
-          if (kDebugMode) {
-            print('Authentication failed, trying without token...');
-          }
-          return getAllSpecializations(); // Retry without token
-        } else {
-          throw HttpException('Authentication required for specializations endpoint');
-        }
       } else {
         throw HttpException('Failed to fetch specializations (status: ${response.statusCode}): ${response.body}');
       }
@@ -87,10 +53,11 @@ class SpecializationService {
     }
   }
 
-  /// Fetch paginated specializations
+  /// Fetch paginated specializations (requires admin authentication)
   Future<List<Specialization>> getSpecializations({
     int page = 1,
     int limit = 10,
+    String? token,
   }) async {
     final uri = Uri.parse(baseUrl).replace(queryParameters: {
       'page': page.toString(),
@@ -98,7 +65,12 @@ class SpecializationService {
     });
     
     try {
-      final response = await _client.get(uri);
+      Map<String, String> headers = {};
+      if (token != null) {
+        headers[HttpHeaders.authorizationHeader] = 'Bearer $token';
+      }
+      
+      final response = await _client.get(uri, headers: headers);
       
       if (response.statusCode == 200) {
         if (kDebugMode) {
@@ -107,20 +79,9 @@ class SpecializationService {
         
         final dynamic responseBody = jsonDecode(response.body);
         
-        if (responseBody is List) {
-          return responseBody.map((e) => Specialization.fromJson(e as Map<String, dynamic>)).toList();
-        } else if (responseBody is Map<String, dynamic>) {
-          List? data;
-          
-          if (responseBody.containsKey('data')) {
-            data = responseBody['data'] as List?;
-          } else if (responseBody.containsKey('specializations')) {
-            data = responseBody['specializations'] as List?;
-          } else if (responseBody.containsKey('result')) {
-            data = responseBody['result'] as List?;
-          }
-          
-          if (data != null) {
+        if (responseBody is Map<String, dynamic>) {
+          if (responseBody.containsKey('specializations')) {
+            final List data = responseBody['specializations'] as List;
             return data.map((e) => Specialization.fromJson(e as Map<String, dynamic>)).toList();
           }
         }
@@ -137,13 +98,14 @@ class SpecializationService {
     }
   }
 
-  /// Create a new specialization
+  /// Create a new specialization (requires admin authentication)
   Future<Specialization> createSpecialization({
     required String name,
     required int fees,
     String? image,
+    required String token,
   }) async {
-    final uri = Uri.parse(baseUrl);
+    final uri = Uri.parse('$baseUrl/create');
     final body = {
       'name': name,
       'fees': fees,
@@ -153,7 +115,10 @@ class SpecializationService {
     try {
       final response = await _client.post(
         uri,
-        headers: {HttpHeaders.contentTypeHeader: 'application/json'},
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        },
         body: jsonEncode(body),
       );
       
@@ -162,9 +127,7 @@ class SpecializationService {
         
         // Handle wrapped response
         if (responseBody is Map<String, dynamic>) {
-          if (responseBody.containsKey('data')) {
-            return Specialization.fromJson(responseBody['data'] as Map<String, dynamic>);
-          } else if (responseBody.containsKey('specialization')) {
+          if (responseBody.containsKey('specialization')) {
             return Specialization.fromJson(responseBody['specialization'] as Map<String, dynamic>);
           } else {
             return Specialization.fromJson(responseBody);
@@ -183,23 +146,27 @@ class SpecializationService {
     }
   }
 
-  /// Update an existing specialization
+  /// Update an existing specialization (requires admin authentication)
   Future<Specialization> updateSpecialization({
     required int specializationId,
     String? name,
     int? fees,
     String? image,
+    required String token,
   }) async {
-    final uri = Uri.parse('$baseUrl/$specializationId');
+    final uri = Uri.parse('$baseUrl/update/$specializationId');
     final Map<String, dynamic> body = {};
     if (name != null) body['name'] = name;
     if (fees != null) body['fees'] = fees;
     if (image != null) body['image'] = image;
 
     try {
-      final response = await _client.put(
+      final response = await _client.patch(
         uri,
-        headers: {HttpHeaders.contentTypeHeader: 'application/json'},
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        },
         body: jsonEncode(body),
       );
       
@@ -208,9 +175,7 @@ class SpecializationService {
         
         // Handle wrapped response
         if (responseBody is Map<String, dynamic>) {
-          if (responseBody.containsKey('data')) {
-            return Specialization.fromJson(responseBody['data'] as Map<String, dynamic>);
-          } else if (responseBody.containsKey('specialization')) {
+          if (responseBody.containsKey('specialization')) {
             return Specialization.fromJson(responseBody['specialization'] as Map<String, dynamic>);
           } else {
             return Specialization.fromJson(responseBody);
@@ -229,14 +194,20 @@ class SpecializationService {
     }
   }
 
-  /// Delete a specialization by ID
+  /// Delete a specialization by ID (requires admin authentication)
   Future<void> deleteSpecialization({
     required int specializationId,
+    required String token,
   }) async {
-    final uri = Uri.parse('$baseUrl/$specializationId');
+    final uri = Uri.parse('$baseUrl/delete/$specializationId');
     
     try {
-      final response = await _client.delete(uri);
+      final response = await _client.delete(
+        uri,
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        },
+      );
       
       if (response.statusCode != 200) {
         throw HttpException('Failed to delete specialization (status: ${response.statusCode}): ${response.body}');

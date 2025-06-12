@@ -46,10 +46,6 @@ class _AuthWrapperState extends State<AuthWrapper> {
   Future<void> _checkAuthAndFirstTime() async {
     final patientController = Provider.of<PatientController>(context, listen: false);
     
-    // Check if user has seen onboarding before
-    // You can use SharedPreferences to store this info
-    // For now, assuming it's always first time
-    
     // Check authentication
     final isAuth = await patientController.isAuthenticated();
     
@@ -69,17 +65,8 @@ class _AuthWrapperState extends State<AuthWrapper> {
       );
     }
 
-    // If first time, show onboarding
-    if (_isFirstTime) {
-      return const OnboardingScreen();
-    }
-
-    // If authenticated, show main app
-    if (_isAuthenticated) {
-      return const NavigationMenu();
-    }
-
-    // If not authenticated, show login
-    return const LoginScreen();
+    // Always show main app (NavigationMenu) first
+    // Users can choose to login from within the app
+    return const NavigationMenu();
   }
 }
