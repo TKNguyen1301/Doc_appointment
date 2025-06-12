@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutterproject/features/home/model/doctor.dart';
 import 'package:flutterproject/features/home/view_model/doctor_controller.dart';
 import 'package:flutterproject/features/authentication/model_view/patient_controller.dart';
+import 'package:flutterproject/features/booking/view/booking_page.dart';
 import 'package:flutterproject/utils/constants/colors.dart';
+
 class DoctorSearchPage extends StatefulWidget {
   /// Nếu muốn filter ngay từ đầu theo chuyên khoa,
   /// truyền tên chuyên khoa vào `specialty`
@@ -132,14 +134,16 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const SizedBox(width: 24),
                     const Text(
                       'Lọc chuyên khoa',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                     ),
                     GestureDetector(
                       onTap: () => Navigator.pop(ctx),
@@ -165,7 +169,8 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
                     } else {
                       // Count doctors for specific specialty
                       doctorCount = _allDoctors
-                          .where((d) => d.specialization?.specializationId == spec['id'])
+                          .where((d) =>
+                              d.specialization?.specializationId == spec['id'])
                           .length;
                     }
 
@@ -175,12 +180,15 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
                         tempId = spec['id'];
                       }),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 14),
                         decoration: BoxDecoration(
                           color: Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: selected ? AppColors.primary : Colors.transparent,
+                            color: selected
+                                ? AppColors.primary
+                                : Colors.transparent,
                             width: 1.5,
                           ),
                         ),
@@ -193,7 +201,9 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
                                   Text(
                                     spec['name'],
                                     style: TextStyle(
-                                      fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+                                      fontWeight: selected
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
                                     ),
                                   ),
                                   Text(
@@ -354,39 +364,50 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
                         )
                       : ListView.separated(
                           itemCount: _filteredDoctors.length,
-                          separatorBuilder: (_, __) => Divider(color: Colors.grey.shade200),
+                          separatorBuilder: (_, __) =>
+                              Divider(color: Colors.grey.shade200),
                           itemBuilder: (_, i) {
                             final d = _filteredDoctors[i];
                             return InkWell(
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8, horizontal: 12),
                                 child: Row(
                                   children: [
                                     CircleAvatar(
                                       radius: 36,
-                                      backgroundImage: d.user?.avatar != null && d.user!.avatar.isNotEmpty
+                                      backgroundImage: d.user?.avatar != null &&
+                                              d.user!.avatar.isNotEmpty
                                           ? NetworkImage(d.user!.avatar)
-                                          : const AssetImage('assets/images/default_avatar.png') as ImageProvider,
+                                          : const AssetImage(
+                                                  'assets/images/default_avatar.png')
+                                              as ImageProvider,
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             "${d.degree} • ${d.user?.username ?? 'Chưa tên'}",
-                                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                            style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600),
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
                                             "${d.specialization?.name ?? 'Chưa rõ'} · ${d.experienceYears} năm",
-                                            style: TextStyle(color: Colors.grey.shade700),
+                                            style: TextStyle(
+                                                color: Colors.grey.shade700),
                                           ),
                                           if (d.rating > 0) ...[
                                             const SizedBox(height: 2),
                                             Row(
                                               children: [
-                                                Icon(Icons.star, color: Colors.amber, size: 16),
+                                                Icon(Icons.star,
+                                                    color: Colors.amber,
+                                                    size: 16),
                                                 const SizedBox(width: 4),
                                                 Text(
                                                   d.rating.toStringAsFixed(1),
@@ -403,12 +424,19 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
                                     ),
                                     ElevatedButton(
                                       onPressed: () {
-                                        // Navigate to booking page
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => BookingPage(
+                                                doctorId: d.doctorId),
+                                          ),
+                                        );
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: AppColors.primary,
                                         foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16, vertical: 8),
                                       ),
                                       child: const Text('Đặt lịch'),
                                     ),

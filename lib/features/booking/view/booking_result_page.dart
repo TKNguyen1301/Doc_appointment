@@ -9,28 +9,33 @@ import 'package:flutterproject/navigation_menu.dart';
 import 'package:get/get.dart';
 
 class BookingResultPage extends StatelessWidget {
-  final Appointment appointment;
+  final Appointment? appointment;
   final Doctor doctor;
   final DateTime selectedDate;
   final String selectedSlot;
   final Map<String, String> patientProfile;
   final String extraInfoText;
   final List<File> extraImages;
+  final bool isSuccess;
+  final String message;
 
   const BookingResultPage({
     Key? key,
-    required this.appointment,
+    this.appointment,
     required this.doctor,
     required this.selectedDate,
     required this.selectedSlot,
     required this.patientProfile,
     this.extraInfoText = '',
     this.extraImages = const [],
+    this.isSuccess = true,
+    this.message = 'Appointment booked successfully!',
   }) : super(key: key);
 
   String get bookingCode {
     final now = DateTime.now();
-    return 'YMA${now.year.toString().substring(2)}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}${appointment.appointmentId.toString().padLeft(4, '0')}';
+    final appointmentId = appointment?.appointmentId ?? 0;
+    return 'YMA${now.year.toString().substring(2)}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}${appointmentId.toString().padLeft(4, '0')}';
   }
 
   void _copyToClipboard(BuildContext context, String text) {
@@ -46,10 +51,11 @@ class BookingResultPage extends StatelessWidget {
   // Thêm method để lấy fee đúng
   int get _actualFee {
     // Ưu tiên: Appointment fees > Specialization fees
-    if (appointment.fees > 0) {
-      return appointment.fees;
+    if (appointment?.fees != null && appointment!.fees > 0) {
+      return appointment!.fees;
     }
-    if (doctor.specialization?.fees != null && doctor.specialization!.fees > 0) {
+    if (doctor.specialization?.fees != null &&
+        doctor.specialization!.fees > 0) {
       return doctor.specialization!.fees;
     }
     return 0;
@@ -103,7 +109,8 @@ class BookingResultPage extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 16),
                     child: Column(
                       children: [
                         Container(
@@ -132,7 +139,8 @@ class BookingResultPage extends StatelessWidget {
                         const SizedBox(height: 6),
                         Text(
                           bookedAtLabel,
-                          style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                          style: TextStyle(
+                              fontSize: 14, color: Colors.grey.shade600),
                         ),
                       ],
                     ),
@@ -146,7 +154,8 @@ class BookingResultPage extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -155,13 +164,15 @@ class BookingResultPage extends StatelessWidget {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(24),
-                              child: doctor.user?.avatar != null && doctor.user!.avatar!.isNotEmpty
+                              child: doctor.user?.avatar != null &&
+                                      doctor.user!.avatar!.isNotEmpty
                                   ? Image.network(
                                       doctor.user!.avatar!,
                                       width: 48,
                                       height: 48,
                                       fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
                                         return Container(
                                           width: 48,
                                           height: 48,
@@ -190,7 +201,9 @@ class BookingResultPage extends StatelessWidget {
                                 children: [
                                   Text(
                                     'BÁC SĨ',
-                                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey.shade600),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
@@ -204,7 +217,9 @@ class BookingResultPage extends StatelessWidget {
                                   const SizedBox(height: 4),
                                   Text(
                                     'Chuyên khoa: ${doctor.specialization?.name ?? 'General'}',
-                                    style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey.shade700),
                                   ),
                                 ],
                               ),
@@ -219,7 +234,8 @@ class BookingResultPage extends StatelessWidget {
                           children: [
                             Text(
                               'Mã lịch khám',
-                              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.grey.shade700),
                             ),
                             const Spacer(),
                             Text(
@@ -232,7 +248,8 @@ class BookingResultPage extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             GestureDetector(
-                              onTap: () => _copyToClipboard(context, bookingCode),
+                              onTap: () =>
+                                  _copyToClipboard(context, bookingCode),
                               child: Icon(
                                 Icons.copy,
                                 size: 20,
@@ -249,7 +266,8 @@ class BookingResultPage extends StatelessWidget {
                           children: [
                             Text(
                               'Ngày khám',
-                              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.grey.shade700),
                             ),
                             const Spacer(),
                             Text(
@@ -270,7 +288,8 @@ class BookingResultPage extends StatelessWidget {
                           children: [
                             Text(
                               'Giờ khám',
-                              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.grey.shade700),
                             ),
                             const Spacer(),
                             Text(
@@ -291,11 +310,13 @@ class BookingResultPage extends StatelessWidget {
                           children: [
                             Text(
                               'Trạng thái',
-                              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.grey.shade700),
                             ),
                             const Spacer(),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
                                 color: Colors.orange.shade100,
                                 borderRadius: BorderRadius.circular(4),
@@ -323,7 +344,8 @@ class BookingResultPage extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -342,7 +364,8 @@ class BookingResultPage extends StatelessWidget {
                         const SizedBox(height: 12),
 
                         // Birthdate
-                        _buildInfoRow('Ngày sinh', patientProfile['birthdate']!),
+                        _buildInfoRow(
+                            'Ngày sinh', patientProfile['birthdate']!),
                         const SizedBox(height: 12),
 
                         // Gender
@@ -350,7 +373,8 @@ class BookingResultPage extends StatelessWidget {
                         const SizedBox(height: 12),
 
                         // Phone
-                        _buildPhoneRow('Số điện thoại', patientProfile['phone']!),
+                        _buildPhoneRow(
+                            'Số điện thoại', patientProfile['phone']!),
                       ],
                     ),
                   ),
@@ -364,7 +388,8 @@ class BookingResultPage extends StatelessWidget {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -380,19 +405,23 @@ class BookingResultPage extends StatelessWidget {
                           if (extraInfoText.isNotEmpty) ...[
                             Text(
                               'Lý do thăm khám:',
-                              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.grey.shade700),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               extraInfoText,
-                              style: const TextStyle(fontSize: 14, color: Colors.black87),
+                              style: const TextStyle(
+                                  fontSize: 14, color: Colors.black87),
                             ),
-                            if (extraImages.isNotEmpty) const SizedBox(height: 12),
+                            if (extraImages.isNotEmpty)
+                              const SizedBox(height: 12),
                           ],
                           if (extraImages.isNotEmpty) ...[
                             Text(
                               'Ảnh đính kèm:',
-                              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.grey.shade700),
                             ),
                             const SizedBox(height: 8),
                             Wrap(
@@ -423,7 +452,8 @@ class BookingResultPage extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -440,7 +470,8 @@ class BookingResultPage extends StatelessWidget {
                           children: [
                             Text(
                               'Phí khám',
-                              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.grey.shade700),
                             ),
                             const Spacer(),
                             Text(
@@ -458,11 +489,13 @@ class BookingResultPage extends StatelessWidget {
                           children: [
                             Text(
                               'Trạng thái',
-                              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.grey.shade700),
                             ),
                             const Spacer(),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
                                 color: Colors.orange.shade100,
                                 borderRadius: BorderRadius.circular(4),
@@ -530,7 +563,8 @@ class BookingResultPage extends StatelessWidget {
   Widget _buildInfoRow(String label, String value) {
     return Row(
       children: [
-        Text(label, style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
+        Text(label,
+            style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
         const Spacer(),
         Text(
           value,
@@ -543,7 +577,8 @@ class BookingResultPage extends StatelessWidget {
   Widget _buildPhoneRow(String label, String value) {
     return Row(
       children: [
-        Text(label, style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
+        Text(label,
+            style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
         const Spacer(),
         Text(
           value,

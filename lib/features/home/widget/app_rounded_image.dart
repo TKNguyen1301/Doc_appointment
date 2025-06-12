@@ -15,7 +15,7 @@ class AppRoundedImage extends StatelessWidget {
     this.fit = BoxFit.contain,
     this.backgroundColor = AppColors.light,
     this.isNetworkImage = false,
-    this.borderRadius= AppSizes.md,
+    this.borderRadius = AppSizes.md,
     required this.title,
     required this.calories,
     required this.duration,
@@ -37,7 +37,6 @@ class AppRoundedImage extends StatelessWidget {
   final String duration;
   final String videoUrl;
 
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -46,14 +45,19 @@ class AppRoundedImage extends StatelessWidget {
         width: width,
         height: height,
         padding: padding,
-        decoration: BoxDecoration( borderRadius: BorderRadius.circular(AppSizes.md)),
+        decoration:
+            BoxDecoration(borderRadius: BorderRadius.circular(AppSizes.md)),
         child: Stack(
           children: [
             ClipRRect(
-              borderRadius: applyImageRadius ? BorderRadius.circular(AppSizes.md) : BorderRadius.zero,
+              borderRadius: applyImageRadius
+                  ? BorderRadius.circular(AppSizes.md)
+                  : BorderRadius.zero,
               child: Image(
                 fit: fit,
-                image: isNetworkImage ? NetworkImage(imageUrl) : AssetImage(imageUrl) as ImageProvider,
+                image: isNetworkImage
+                    ? NetworkImage(imageUrl)
+                    : AssetImage(imageUrl) as ImageProvider,
               ),
             ),
             // Icon play
