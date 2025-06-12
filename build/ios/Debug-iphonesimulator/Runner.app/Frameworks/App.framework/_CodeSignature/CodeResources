@@ -22,7 +22,7 @@
 		</data>
 		<key>flutter_assets/NOTICES.Z</key>
 		<data>
-		4CYoRI/Yj+OEkKq8xxF45N7vnYI=
+		duRv7Ws3NcabdFTKSCiBMe99as0=
 		</data>
 		<key>flutter_assets/NativeAssetsManifest.json</key>
 		<data>
@@ -258,7 +258,7 @@
 		</data>
 		<key>flutter_assets/kernel_blob.bin</key>
 		<data>
-		Eog3k2jlT2ebHcI5ZOO4WuyNmaA=
+		fj1+yPkJQ/ymxQMVpB8BZGbcRZM=
 		</data>
 		<key>flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>
 		<data>
@@ -304,7 +304,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			6efuM2r1srl4mVhom0unMgtNy87XwOqgDM8OYK6scOM=
+			1qyi0P69zXtcKoGBOHBlopZqZukB0LfV1dLWbQrP7pM=
 			</data>
 		</dict>
 		<key>flutter_assets/NativeAssetsManifest.json</key>
@@ -703,11 +703,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-<<<<<<< HEAD
-			FmCWqbMu0HtNPUX8a1PBUVKBaVNKWuvI3nQHxRfC5to=
-=======
-			QEXqaadISTMXTqjdxZa6hBZUCDqZkaU6PZmuaZCtlao=
->>>>>>> f6d7ced (Fix Home UI and controller)
+			ZOPoaq15cL0klkLnFXYdvSxgidcXY4zsnDC3xtO7MY0=
 			</data>
 		</dict>
 		<key>flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>

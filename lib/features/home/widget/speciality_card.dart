@@ -1,11 +1,10 @@
 // Widget riêng cho từng ô chuyên khoa
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:flutterproject/utils/constants/colors.dart';
 
 class SpecialityCard extends StatelessWidget {
   final String label;
-  final String? image; // Đổi từ imageData thành image
+  final String? image;
   final VoidCallback onTap;
 
   const SpecialityCard({
@@ -30,28 +29,10 @@ class SpecialityCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            // Hiển thị ảnh: nếu có image thì dùng Image.memory, không thì dùng SVG mặc định
             SizedBox(
               height: 48,
               width: 48,
-              child: image != null && image!.isNotEmpty
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.memory(
-                        Uri.parse(image!).data!.contentAsBytes(),
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return SvgPicture.asset(
-                            'assets/assets_frontend/General_physician.svg',
-                            height: 48,
-                          );
-                        },
-                      ),
-                    )
-                  : SvgPicture.asset(
-                      'assets/assets_frontend/General_physician.svg',
-                      height: 48,
-                    ),
+              child: _buildImage(),
             ),
             const SizedBox(height: 8),
             Text(
@@ -63,6 +44,66 @@ class SpecialityCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildImage() {
+    // Check if image is provided and is a valid URL
+    if (image != null && image!.isNotEmpty && image!.startsWith('http')) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.network(
+          image!,
+          fit: BoxFit.cover,
+          width: 48,
+          height: 48,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildDefaultImage();
+          },
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                        : null,
+                    strokeWidth: 2,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    }
+
+    return _buildDefaultImage();
+  }
+
+  Widget _buildDefaultImage() {
+    return Container(
+      height: 48,
+      width: 48,
+      decoration: BoxDecoration(
+        color: Colors.blue[100],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Icon(
+        Icons.medical_services,
+        color: Colors.blue[600],
+        size: 24,
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterproject/features/home/model/doctor.dart';
 import 'package:flutterproject/features/home/view_model/doctor_controller.dart';
-import 'package:flutterproject/features/booking/booking_page.dart';
+import 'package:flutterproject/features/authentication/model_view/patient_controller.dart';
 
 class DoctorSearchPage extends StatefulWidget {
   /// Nếu muốn filter ngay từ đầu theo chuyên khoa,
@@ -17,6 +17,7 @@ class DoctorSearchPage extends StatefulWidget {
 class _DoctorSearchPageState extends State<DoctorSearchPage> {
   final TextEditingController _searchController = TextEditingController();
   final DoctorController _controller = DoctorController();
+  final PatientController _patientController = PatientController();
 
   List<Doctor> _allDoctors = [];
   List<Doctor> _filteredDoctors = [];
@@ -47,44 +48,70 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
   Future<void> _fetchDoctors() async {
     setState(() => _isLoading = true);
     try {
-      final doctors = await _controller.fetchAllDoctors(
-        specializationId: _selectedSpecialtyId?.toString(),
-      );
+      // Get token for authentication
+      await _patientController.isAuthenticated();
+      final token = _patientController.token;
+
+      // Fetch ALL doctors without any filter to get complete data
+      final doctors = await _controller.fetchAllDoctors(token: token);
 
       setState(() {
         _allDoctors = doctors;
-        // Lấy danh sách chuyên khoa duy nhất
-        final specs = _allDoctors
-            .where((d) => d.specialization != null)
-            .map((d) => {
-                  'id': d.specialization!.specializationId,
-                  'name': d.specialization!.name,
-                })
-            .toSet()
-            .toList();
+
+        // Extract unique specializations from all doctors
+        final Map<int, Map<String, dynamic>> uniqueSpecs = {};
+        for (final doctor in _allDoctors) {
+          if (doctor.specialization != null) {
+            final spec = doctor.specialization!;
+            uniqueSpecs[spec.specializationId] = {
+              'id': spec.specializationId,
+              'name': spec.name,
+            };
+          }
+        }
+
         _specialties = [
           {'id': null, 'name': 'Tất cả'},
-          ...specs,
+          ...uniqueSpecs.values.toList(),
         ];
+
+        // Set initial filter if specialty is provided
+        if (widget.specialty != null && widget.specialty!.isNotEmpty) {
+          final matchingSpec = _specialties.firstWhere(
+            (spec) => spec['name'] == widget.specialty,
+            orElse: () => {'id': null, 'name': 'Tất cả'},
+          );
+          _selectedSpecialtyName = matchingSpec['name'];
+          _selectedSpecialtyId = matchingSpec['id'];
+        }
+
         _isLoading = false;
       });
+
       _applyFilters();
     } catch (e) {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Không thể tải danh sách bác sĩ:\n\$e')),
+        SnackBar(content: Text('Không thể tải danh sách bác sĩ: $e')),
       );
     }
   }
 
   void _applyFilters() {
     final query = _searchController.text.trim().toLowerCase();
+
     setState(() {
       _filteredDoctors = _allDoctors.where((doc) {
-        final bySearch = query.isEmpty ||
+        // Filter by search query
+        final matchesSearch = query.isEmpty ||
             (doc.user?.username.toLowerCase().contains(query) ?? false) ||
             (doc.specialization?.name.toLowerCase().contains(query) ?? false);
-        return bySearch;
+
+        // Filter by specialty
+        final matchesSpecialty = _selectedSpecialtyId == null ||
+            doc.specialization?.specializationId == _selectedSpecialtyId;
+
+        return matchesSearch && matchesSpecialty;
       }).toList();
     });
   }
@@ -92,6 +119,7 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
   void _showSpecialtyFilterSheet() {
     String tempName = _selectedSpecialtyName;
     int? tempId = _selectedSpecialtyId;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -128,6 +156,19 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
                   itemBuilder: (_, i) {
                     final spec = _specialties[i];
                     final selected = spec['id'] == tempId;
+
+                    // Count doctors for this specialty
+                    int doctorCount = 0;
+                    if (spec['id'] == null) {
+                      // "Tất cả" - count all doctors
+                      doctorCount = _allDoctors.length;
+                    } else {
+                      // Count doctors for specific specialty
+                      doctorCount = _allDoctors
+                          .where((d) => d.specialization?.specializationId == spec['id'])
+                          .length;
+                    }
+
                     return InkWell(
                       onTap: () => setStateBottom(() {
                         tempName = spec['name'];
@@ -145,7 +186,26 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
                         ),
                         child: Row(
                           children: [
-                            Expanded(child: Text(spec['name'])),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    spec['name'],
+                                    style: TextStyle(
+                                      fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+                                    ),
+                                  ),
+                                  Text(
+                                    '$doctorCount bác sĩ',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                             Radio<int?>(
                               value: spec['id'],
                               groupValue: tempId,
@@ -174,7 +234,8 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
                         _selectedSpecialtyName = tempName;
                         _selectedSpecialtyId = tempId;
                       });
-                      _fetchDoctors();
+                      // Don't fetch doctors again, just apply filters
+                      _applyFilters();
                     },
                     child: const Text('Áp dụng'),
                   ),
@@ -241,6 +302,14 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
                           const Icon(Icons.category, size: 20),
                           const SizedBox(width: 6),
                           Text('Chuyên khoa: $_selectedSpecialtyName'),
+                          if (_selectedSpecialtyId != null)
+                            Text(
+                              ' (${_filteredDoctors.length})',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                              ),
+                            ),
                           const Spacer(),
                           const Icon(Icons.keyboard_arrow_down, size: 20),
                         ],
@@ -252,9 +321,35 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
                 Expanded(
                   child: _filteredDoctors.isEmpty
                       ? Center(
-                          child: Text(
-                            'Không tìm thấy bác sĩ.',
-                            style: TextStyle(color: Colors.grey.shade600),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.search_off,
+                                size: 48,
+                                color: Colors.grey[400],
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Không tìm thấy bác sĩ phù hợp',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedSpecialtyName = 'Tất cả';
+                                    _selectedSpecialtyId = null;
+                                    _searchController.clear();
+                                  });
+                                  _applyFilters();
+                                },
+                                child: const Text('Xem tất cả bác sĩ'),
+                              ),
+                            ],
                           ),
                         )
                       : ListView.separated(
@@ -263,14 +358,6 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
                           itemBuilder: (_, i) {
                             final d = _filteredDoctors[i];
                             return InkWell(
-                              // onTap: () {
-                              //   Navigator.push(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //       builder: (_) => BookingPage(doctor: d),
-                              //     ),
-                              //   );
-                              // },
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                                 child: Row(
@@ -295,18 +382,34 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
                                             "${d.specialization?.name ?? 'Chưa rõ'} · ${d.experienceYears} năm",
                                             style: TextStyle(color: Colors.grey.shade700),
                                           ),
+                                          if (d.rating > 0) ...[
+                                            const SizedBox(height: 2),
+                                            Row(
+                                              children: [
+                                                Icon(Icons.star, color: Colors.amber, size: 16),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  d.rating.toStringAsFixed(1),
+                                                  style: TextStyle(
+                                                    color: Colors.grey[700],
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
                                         ],
                                       ),
                                     ),
                                     ElevatedButton(
                                       onPressed: () {
-                                        // Navigator.push(
-                                        //   context,
-                                        //   MaterialPageRoute(
-                                        //     builder: (_) => BookingPage(doctor: d),
-                                        //   ),
-                                        // );
+                                        // Navigate to booking page
                                       },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.blue,
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                      ),
                                       child: const Text('Đặt lịch'),
                                     ),
                                   ],
