@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterproject/features/home/model/doctor.dart';
+import 'package:flutterproject/utils/widgets/network_image_with_timeout.dart';
 
 class DoctorAppointmentCard extends StatelessWidget {
   final Doctor doctor;
@@ -26,19 +27,10 @@ class DoctorAppointmentCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: doctor.user?.avatar != null && doctor.user!.avatar!.isNotEmpty
-                ? Image.network(
-                    doctor.user!.avatar!,
-                    width: 48,
-                    height: 48,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return _buildDefaultAvatar();
-                    },
-                  )
-                : _buildDefaultAvatar(),
+          AvatarImageWithTimeout(
+            imageUrl: doctor.user?.avatar,
+            radius: 24,
+            timeout: const Duration(seconds: 8),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -63,7 +55,9 @@ class DoctorAppointmentCard extends StatelessWidget {
                   'Chuyên khoa: ${doctor.specialization?.name ?? 'General'}',
                   style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
                 ),
-                if (showScheduleInfo && selectedSlot != null && selectedDate != null) ...[
+                if (showScheduleInfo &&
+                    selectedSlot != null &&
+                    selectedDate != null) ...[
                   const SizedBox(height: 8),
                   Text(
                     'Giờ khám: $selectedSlot',
@@ -85,19 +79,6 @@ class DoctorAppointmentCard extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildDefaultAvatar() {
-    return Container(
-      width: 48,
-      height: 48,
-      color: Colors.grey[200],
-      child: Icon(
-        Icons.person,
-        size: 24,
-        color: Colors.grey[400],
       ),
     );
   }

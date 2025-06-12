@@ -4,7 +4,7 @@ import 'package:flutterproject/features/home/widget/app_primary_header_container
 import 'package:flutterproject/features/home/widget/app_promo_slider.dart';
 import 'package:flutterproject/features/home/widget/find_by_speciality_section.dart';
 import 'package:flutterproject/features/home/widget/doctor_list_section.dart';
-import 'package:flutterproject/features/screens/calendar/appointment_page.dart';
+import 'package:flutterproject/features/calendar/view/appointment_page.dart';
 import 'package:flutterproject/features/search_page/view/search_doctor.dart';
 import 'package:flutterproject/features/authentication/screens.onboarding/login/login.dart';
 import 'package:flutterproject/features/authentication/model_view/patient_controller.dart';

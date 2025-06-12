@@ -43,6 +43,47 @@ class Appointment {
     this.medicalRecord,
   });
 
+  // Helper method to parse custom datetime format from API
+  static DateTime _parseDateTime(String dateTimeString) {
+    try {
+      // Try standard ISO format first
+      return DateTime.parse(dateTimeString);
+    } catch (e) {
+      try {
+        // Handle custom format: "09:00:00 12/6/2025"
+        final parts = dateTimeString.split(' ');
+        if (parts.length == 2) {
+          final timePart = parts[0]; // "09:00:00"
+          final datePart = parts[1]; // "12/6/2025"
+
+          final dateParts = datePart.split('/');
+          if (dateParts.length == 3) {
+            final day = int.parse(dateParts[0]);
+            final month = int.parse(dateParts[1]);
+            final year = int.parse(dateParts[2]);
+
+            final timeParts = timePart.split(':');
+            if (timeParts.length >= 2) {
+              final hour = int.parse(timeParts[0]);
+              final minute = int.parse(timeParts[1]);
+              final second = timeParts.length > 2 ? int.parse(timeParts[2]) : 0;
+
+              return DateTime(year, month, day, hour, minute, second);
+            }
+          }
+        }
+
+        // If all parsing attempts fail, return current time as fallback
+        print(
+            '⚠️ Warning: Could not parse datetime "$dateTimeString", using current time as fallback');
+        return DateTime.now();
+      } catch (e) {
+        print('❌ Error parsing datetime "$dateTimeString": $e');
+        return DateTime.now();
+      }
+    }
+  }
+
   factory Appointment.fromJson(Map<String, dynamic> json) {
     return Appointment(
       appointmentId: json['appointment_id'] as int,
@@ -50,11 +91,12 @@ class Appointment {
       doctorId: json['doctor_id'] as int,
       bookingSource: json['booking_source'] as String,
       reason: json['reason'] as String?,
-      appointmentDatetime: DateTime.parse(json['appointment_datetime'] as String),
+      appointmentDatetime:
+          _parseDateTime(json['appointment_datetime'] as String),
       status: json['status'] as String,
       arrivalStatus: json['arrival_status'] as String,
       checkinTime: json['checkin_time'] != null
-          ? DateTime.parse(json['checkin_time'] as String)
+          ? _parseDateTime(json['checkin_time'] as String)
           : null,
       fees: json['fees'] as int,
       patient: json['patient'] != null
@@ -73,7 +115,8 @@ class Appointment {
           ? Payment.fromJson(json['payment'] as Map<String, dynamic>)
           : null,
       medicalRecord: json['medical_record'] != null
-          ? MedicalRecord.fromJson(json['medical_record'] as Map<String, dynamic>)
+          ? MedicalRecord.fromJson(
+              json['medical_record'] as Map<String, dynamic>)
           : null,
     );
   }

@@ -2,7 +2,7 @@ class DateFormatter {
   static String formatDate(DateTime dt) {
     final weekdayMap = {
       1: 'T2',
-      2: 'T3', 
+      2: 'T3',
       3: 'T4',
       4: 'T5',
       5: 'T6',
@@ -34,20 +34,39 @@ class DateFormatter {
   }
 
   static DateTime parseSlotEndTime(DateTime dateObj, String slot) {
-    final parts = slot.split('-');
-    final endPart = parts[1].trim();
-    final hm = endPart.split(':');
-    final int hour = int.parse(hm[0]);
-    final int minute = int.parse(hm[1]);
-    return DateTime(dateObj.year, dateObj.month, dateObj.day, hour, minute);
+    if (slot.contains('-')) {
+      // Range format: "07:00 - 07:30"
+      final parts = slot.split('-');
+      final endPart = parts[1].trim();
+      final hm = endPart.split(':');
+      final int hour = int.parse(hm[0]);
+      final int minute = int.parse(hm[1]);
+      return DateTime(dateObj.year, dateObj.month, dateObj.day, hour, minute);
+    } else {
+      // Single time format: "07:00" -> assume 10 minutes duration
+      final hm = slot.trim().split(':');
+      final int hour = int.parse(hm[0]);
+      final int minute = int.parse(hm[1]);
+      return DateTime(
+          dateObj.year, dateObj.month, dateObj.day, hour, minute + 10);
+    }
   }
 
   static DateTime parseSlotStartTime(DateTime dateObj, String slot) {
-    final parts = slot.split('-');
-    final startPart = parts[0].trim();
-    final hm = startPart.split(':');
-    final int hour = int.parse(hm[0]);
-    final int minute = int.parse(hm[1]);
-    return DateTime(dateObj.year, dateObj.month, dateObj.day, hour, minute);
+    if (slot.contains('-')) {
+      // Range format: "07:00 - 07:30"
+      final parts = slot.split('-');
+      final startPart = parts[0].trim();
+      final hm = startPart.split(':');
+      final int hour = int.parse(hm[0]);
+      final int minute = int.parse(hm[1]);
+      return DateTime(dateObj.year, dateObj.month, dateObj.day, hour, minute);
+    } else {
+      // Single time format: "07:00"
+      final hm = slot.trim().split(':');
+      final int hour = int.parse(hm[0]);
+      final int minute = int.parse(hm[1]);
+      return DateTime(dateObj.year, dateObj.month, dateObj.day, hour, minute);
+    }
   }
 }

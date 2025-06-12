@@ -29,30 +29,32 @@ class DoctorController {
       if (endTime != null) 'end_time': endTime,
     };
     final uri = Uri.parse('$_baseUrl/all').replace(queryParameters: query);
-    
+
     try {
       Map<String, String> headers = {};
       if (token != null) {
         headers[HttpHeaders.authorizationHeader] = 'Bearer $token';
       }
-      
+
       final response = await http.get(uri, headers: headers);
 
       if (response.statusCode == 200) {
         if (kDebugMode) {
           print('API Response: ${response.body}');
         }
-        
+
         final dynamic responseBody = jsonDecode(response.body);
-        
+
         // Handle different response formats
         if (responseBody is List) {
           // Direct list response
-          return responseBody.map((e) => Doctor.fromJson(e as Map<String, dynamic>)).toList();
+          return responseBody
+              .map((e) => Doctor.fromJson(e as Map<String, dynamic>))
+              .toList();
         } else if (responseBody is Map<String, dynamic>) {
           // Object response - check various possible keys
           List? doctorsList;
-          
+
           if (responseBody.containsKey('data')) {
             doctorsList = responseBody['data'] as List?;
           } else if (responseBody.containsKey('doctors')) {
@@ -62,23 +64,26 @@ class DoctorController {
           } else if (responseBody.containsKey('items')) {
             doctorsList = responseBody['items'] as List?;
           }
-          
+
           if (doctorsList != null) {
-            return doctorsList.map((e) => Doctor.fromJson(e as Map<String, dynamic>)).toList();
+            return doctorsList
+                .map((e) => Doctor.fromJson(e as Map<String, dynamic>))
+                .toList();
           } else {
             // If it's a single doctor object, wrap in list
-            if (responseBody.containsKey('id') || responseBody.containsKey('_id')) {
+            if (responseBody.containsKey('id') ||
+                responseBody.containsKey('_id')) {
               return [Doctor.fromJson(responseBody)];
             }
           }
         }
-        
+
         // If we reach here, return empty list instead of throwing error
         if (kDebugMode) {
-          print('Unexpected response format, returning empty list. Response: $responseBody');
+          print(
+              'Unexpected response format, returning empty list. Response: $responseBody');
         }
         return <Doctor>[];
-        
       } else {
         throw HttpException(
           'Failed to fetch doctors (status: ${response.statusCode}): ${response.body}',
@@ -123,8 +128,9 @@ class DoctorController {
       'limit': limit.toString(),
       if (status != null) 'status': status,
     };
-    final uri = Uri.parse('$_baseUrl/appointments').replace(queryParameters: query);
-    
+    final uri =
+        Uri.parse('$_baseUrl/appointments').replace(queryParameters: query);
+
     try {
       final response = await http.get(
         uri,
@@ -133,12 +139,17 @@ class DoctorController {
 
       if (response.statusCode == 200) {
         final dynamic responseBody = jsonDecode(response.body);
-        
+
         if (responseBody is List) {
-          return responseBody.map((e) => Appointment.fromJson(e as Map<String, dynamic>)).toList();
-        } else if (responseBody is Map<String, dynamic> && responseBody.containsKey('data')) {
+          return responseBody
+              .map((e) => Appointment.fromJson(e as Map<String, dynamic>))
+              .toList();
+        } else if (responseBody is Map<String, dynamic> &&
+            responseBody.containsKey('data')) {
           final List data = responseBody['data'] as List;
-          return data.map((e) => Appointment.fromJson(e as Map<String, dynamic>)).toList();
+          return data
+              .map((e) => Appointment.fromJson(e as Map<String, dynamic>))
+              .toList();
         } else {
           throw HttpException(
             'Unexpected response format for appointments',
@@ -172,7 +183,9 @@ class DoctorController {
 
     if (response.statusCode == 200) {
       final List data = jsonDecode(response.body) as List;
-      return data.map((e) => Appointment.fromJson(e as Map<String, dynamic>)).toList();
+      return data
+          .map((e) => Appointment.fromJson(e as Map<String, dynamic>))
+          .toList();
     } else {
       throw HttpException(
         'Failed to fetch patient appointments (status: ${response.statusCode})',
@@ -268,7 +281,9 @@ class DoctorController {
 
     if (response.statusCode == 200) {
       final List data = jsonDecode(response.body) as List;
-      return data.map((e) => Feedback.fromJson(e as Map<String, dynamic>)).toList();
+      return data
+          .map((e) => Feedback.fromJson(e as Map<String, dynamic>))
+          .toList();
     } else {
       throw HttpException(
         'Failed to fetch feedback (status: ${response.statusCode})',

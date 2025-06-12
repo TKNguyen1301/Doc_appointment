@@ -27,7 +27,7 @@ class BookingPage extends StatefulWidget {
 
 class _BookingPageState extends State<BookingPage> {
   final DoctorController _doctorController = DoctorController();
-  
+
   Doctor? _doctor;
   bool _isLoading = true;
   String? _error;
@@ -52,15 +52,61 @@ class _BookingPageState extends State<BookingPage> {
   };
 
   final List<String> _morningSlots = [
-    '07:30 - 07:40', '07:40 - 07:50', '07:50 - 08:00', '08:00 - 08:10',
-    '08:10 - 08:20', '08:20 - 08:30', '08:30 - 08:40', '08:40 - 08:50', '08:50 - 09:00',
+    '07:00',
+    '07:10',
+    '07:20',
+    '07:30',
+    '07:40',
+    '07:50',
+    '08:00',
+    '08:10',
+    '08:20',
+    '08:30',
+    '08:40',
+    '08:50',
+    '09:00',
+    '09:10',
+    '09:20',
+    '09:30',
+    '09:40',
+    '09:50',
+    '10:00',
+    '10:10',
+    '10:20',
+    '10:30',
+    '10:40',
+    '10:50',
+    '11:00',
+    '11:10',
+    '11:20',
+    '11:30',
+    '11:40',
+    '11:50',
+    '12:00',
   ];
 
   final List<String> _afternoonSlots = [
-    '17:30 - 17:40', '17:40 - 17:50', '17:50 - 18:00', '18:00 - 18:10',
-    '18:10 - 18:20', '18:20 - 18:30', '18:30 - 18:40', '18:40 - 18:50',
-    '18:50 - 19:00', '19:00 - 19:10', '19:10 - 19:20', '19:20 - 19:30',
-    '19:30 - 19:40', '19:40 - 19:50', '19:50 - 20:00',
+    '13:30',
+    '13:40',
+    '13:50',
+    '14:00',
+    '14:10',
+    '14:20',
+    '14:30',
+    '14:40',
+    '14:50',
+    '15:00',
+    '15:10',
+    '15:20',
+    '15:30',
+    '15:40',
+    '15:50',
+    '16:00',
+    '16:10',
+    '16:20',
+    '16:30',
+    '16:40',
+    '16:50',
   ];
 
   String _extraInfoText = '';
@@ -77,9 +123,10 @@ class _BookingPageState extends State<BookingPage> {
   }
 
   Future<void> _checkLoginStatus() async {
-    final patientController = Provider.of<PatientController>(context, listen: false);
+    final patientController =
+        Provider.of<PatientController>(context, listen: false);
     final isAuth = await patientController.isAuthenticated();
-    
+
     if (isAuth && patientController.profile == null) {
       try {
         await patientController.fetchProfile();
@@ -87,19 +134,24 @@ class _BookingPageState extends State<BookingPage> {
         print('Failed to fetch profile: $e');
       }
     }
-    
+
     setState(() {
       _isUserLoggedIn = patientController.profile != null;
-      
+
       if (_isUserLoggedIn && patientController.profile != null) {
         final profile = patientController.profile!;
         _patientProfile = {
           'name': profile.user?.username ?? 'Không có tên',
-          'gender': profile.gender != null ? 
-              (profile.gender == Gender.male ? 'Nam' : 
-               profile.gender == Gender.female ? 'Nữ' : 'Khác') : '--',
-          'birthdate': profile.dateOfBirth != null ? 
-              '${profile.dateOfBirth!.day.toString().padLeft(2, '0')}/${profile.dateOfBirth!.month.toString().padLeft(2, '0')}/${profile.dateOfBirth!.year}' : '--',
+          'gender': profile.gender != null
+              ? (profile.gender == Gender.male
+                  ? 'Nam'
+                  : profile.gender == Gender.female
+                      ? 'Nữ'
+                      : 'Khác')
+              : '--',
+          'birthdate': profile.dateOfBirth != null
+              ? '${profile.dateOfBirth!.day.toString().padLeft(2, '0')}/${profile.dateOfBirth!.month.toString().padLeft(2, '0')}/${profile.dateOfBirth!.year}'
+              : '--',
           'phone': profile.phoneNumber ?? '--',
         };
       }
@@ -113,12 +165,15 @@ class _BookingPageState extends State<BookingPage> {
         _error = null;
       });
 
-      final patientController = Provider.of<PatientController>(context, listen: false);
+      final patientController =
+          Provider.of<PatientController>(context, listen: false);
       await patientController.isAuthenticated();
       final token = patientController.token;
 
-      final List<Doctor> doctors = await _doctorController.fetchAllDoctors(token: token);
-      final Doctor? foundDoctor = doctors.where((d) => d.doctorId == widget.doctorId).firstOrNull;
+      final List<Doctor> doctors =
+          await _doctorController.fetchAllDoctors(token: token);
+      final Doctor? foundDoctor =
+          doctors.where((d) => d.doctorId == widget.doctorId).firstOrNull;
 
       if (foundDoctor != null) {
         setState(() {
@@ -158,7 +213,8 @@ class _BookingPageState extends State<BookingPage> {
     List<Map<String, dynamic>> tempDates = [];
     for (int d = startDay; d <= daysInMonth; d++) {
       final dateObj = DateTime(year, month, d);
-      final String weekdayStr = dateObj.weekday == 7 ? 'CN' : 'T${dateObj.weekday + 1}';
+      final String weekdayStr =
+          dateObj.weekday == 7 ? 'CN' : 'T${dateObj.weekday + 1}';
       int availableSlots = _calculateAvailableSlots(dateObj);
       tempDates.add({
         'weekday': weekdayStr,
@@ -240,10 +296,12 @@ class _BookingPageState extends State<BookingPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Tháng', style: TextStyle(fontWeight: FontWeight.w600)),
+                            const Text('Tháng',
+                                style: TextStyle(fontWeight: FontWeight.w600)),
                             const SizedBox(height: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey[300]!),
                                 borderRadius: BorderRadius.circular(12),
@@ -256,21 +314,29 @@ class _BookingPageState extends State<BookingPage> {
                                     12,
                                     (index) => DropdownMenuItem(
                                       value: index + 1,
-                                      child: Text('Tháng ${(index + 1).toString().padLeft(2, '0')}'),
+                                      child: Text(
+                                          'Tháng ${(index + 1).toString().padLeft(2, '0')}'),
                                     ),
                                   ),
                                   onChanged: (value) {
                                     if (value != null) {
                                       // Kiểm tra tháng không được trong quá khứ
-                                      final DateTime selectedMonth = DateTime(tempSelectedYear, value, 1);
-                                      final DateTime currentMonth = DateTime(now.year, now.month, 1);
-                                      if (selectedMonth.isBefore(currentMonth)) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('Không thể chọn tháng trong quá khứ')),
+                                      final DateTime selectedMonth =
+                                          DateTime(tempSelectedYear, value, 1);
+                                      final DateTime currentMonth =
+                                          DateTime(now.year, now.month, 1);
+                                      if (selectedMonth
+                                          .isBefore(currentMonth)) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              content: Text(
+                                                  'Không thể chọn tháng trong quá khứ')),
                                         );
                                         return;
                                       }
-                                      setModalState(() => tempSelectedMonth = value);
+                                      setModalState(
+                                          () => tempSelectedMonth = value);
                                     }
                                   },
                                 ),
@@ -284,10 +350,12 @@ class _BookingPageState extends State<BookingPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Năm', style: TextStyle(fontWeight: FontWeight.w600)),
+                            const Text('Năm',
+                                style: TextStyle(fontWeight: FontWeight.w600)),
                             const SizedBox(height: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey[300]!),
                                 borderRadius: BorderRadius.circular(12),
@@ -305,7 +373,8 @@ class _BookingPageState extends State<BookingPage> {
                                   ),
                                   onChanged: (value) {
                                     if (value != null) {
-                                      setModalState(() => tempSelectedYear = value);
+                                      setModalState(
+                                          () => tempSelectedYear = value);
                                     }
                                   },
                                 ),
@@ -325,7 +394,8 @@ class _BookingPageState extends State<BookingPage> {
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.grey[700],
                             side: BorderSide(color: Colors.grey[300]!),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
                           ),
                           child: const Padding(
                             padding: EdgeInsets.symmetric(vertical: 16),
@@ -337,13 +407,15 @@ class _BookingPageState extends State<BookingPage> {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            _displayedMonth = DateTime(tempSelectedYear, tempSelectedMonth, 1);
+                            _displayedMonth = DateTime(
+                                tempSelectedYear, tempSelectedMonth, 1);
                             _generateDatesForMonth(_displayedMonth);
                             Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
                           ),
                           child: const Text('Xác nhận'),
                         ),
@@ -380,11 +452,13 @@ class _BookingPageState extends State<BookingPage> {
           TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              Navigator.of(context).push(
+              Navigator.of(context)
+                  .push(
                 MaterialPageRoute(
                   builder: (context) => const LoginScreen(),
                 ),
-              ).then((_) {
+              )
+                  .then((_) {
                 _checkLoginStatus();
               });
             },
@@ -398,7 +472,8 @@ class _BookingPageState extends State<BookingPage> {
   // Thêm method để tính fee
   int get _calculatedFee {
     // Ưu tiên: Specialization fees > Default
-    if (_doctor?.specialization?.fees != null && _doctor!.specialization!.fees > 0) {
+    if (_doctor?.specialization?.fees != null &&
+        _doctor!.specialization!.fees > 0) {
       return _doctor!.specialization!.fees;
     }
     return 0; // Default fee
@@ -416,7 +491,8 @@ class _BookingPageState extends State<BookingPage> {
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          title: const Text('Đặt lịch khám', style: TextStyle(color: Colors.white)),
+          title: const Text('Đặt lịch khám',
+              style: TextStyle(color: Colors.white)),
           centerTitle: true,
         ),
         body: const Center(child: CircularProgressIndicator()),
@@ -433,7 +509,8 @@ class _BookingPageState extends State<BookingPage> {
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          title: const Text('Đặt lịch khám', style: TextStyle(color: Colors.white)),
+          title: const Text('Đặt lịch khám',
+              style: TextStyle(color: Colors.white)),
           centerTitle: true,
         ),
         body: Center(
@@ -467,7 +544,8 @@ class _BookingPageState extends State<BookingPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text('Đặt lịch khám', style: TextStyle(color: Colors.white)),
+        title:
+            const Text('Đặt lịch khám', style: TextStyle(color: Colors.white)),
         centerTitle: true,
       ),
       body: Column(
@@ -483,23 +561,22 @@ class _BookingPageState extends State<BookingPage> {
                 children: [
                   DoctorAppointmentCard(doctor: _doctor!),
                   const SizedBox(height: 16),
-                  
                   PatientInfoSection(
                     isUserLoggedIn: _isUserLoggedIn,
                     patientProfile: _patientProfile,
                     onLogin: () {
-                      Navigator.of(context).push(
+                      Navigator.of(context)
+                          .push(
                         MaterialPageRoute(
                           builder: (context) => const LoginScreen(),
                         ),
-                      ).then((_) {
+                      )
+                          .then((_) {
                         _checkLoginStatus();
                       });
                     },
                   ),
-                  
                   const SizedBox(height: 16),
-                  
                   DateSelector(
                     displayedMonth: _displayedMonth,
                     dates: _dates,
@@ -512,10 +589,9 @@ class _BookingPageState extends State<BookingPage> {
                     },
                     onMonthYearPick: _pickMonthYear,
                   ),
-                  
                   const SizedBox(height: 16),
-                  
-                  if (_dates.isNotEmpty && _selectedDateIndex < _dates.length) ...[
+                  if (_dates.isNotEmpty &&
+                      _selectedDateIndex < _dates.length) ...[
                     TimeSlotsSection(
                       selectedSession: _selectedSession,
                       selectedTimeIndex: _selectedTimeIndex,
@@ -538,13 +614,12 @@ class _BookingPageState extends State<BookingPage> {
                       },
                     ),
                   ],
-                  
                   const SizedBox(height: 16),
-                  
                   if (_isUserLoggedIn) ...[
                     const Text(
                       'Thông tin bổ sung (không bắt buộc)',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: 8),
                     TextField(
@@ -555,16 +630,15 @@ class _BookingPageState extends State<BookingPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      onChanged: (val) => setState(() => _extraInfoText = val.trim()),
+                      onChanged: (val) =>
+                          setState(() => _extraInfoText = val.trim()),
                     ),
                   ],
-                  
                   const SizedBox(height: 80),
                 ],
               ),
             ),
           ),
-          
           Container(
             color: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -574,7 +648,8 @@ class _BookingPageState extends State<BookingPage> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
                 ),
                 onPressed: () {
                   if (!_isUserLoggedIn) {
@@ -582,22 +657,28 @@ class _BookingPageState extends State<BookingPage> {
                     return;
                   }
 
-                  if (_selectedTimeIndex < 0 || _dates.isEmpty || _selectedDateIndex >= _dates.length) {
+                  if (_selectedTimeIndex < 0 ||
+                      _dates.isEmpty ||
+                      _selectedDateIndex >= _dates.length) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Vui lòng chọn khung giờ khám')),
+                      const SnackBar(
+                          content: Text('Vui lòng chọn khung giờ khám')),
                     );
                     return;
                   }
 
-                  final Map<String, dynamic> dayInfo = _dates[_selectedDateIndex];
+                  final Map<String, dynamic> dayInfo =
+                      _dates[_selectedDateIndex];
                   final DateTime dateObj = dayInfo['dateObj'] as DateTime;
 
                   final bool isMorning = (_selectedSession == 'morning');
-                  final List<String> currentSlots = isMorning ? _morningSlots : _afternoonSlots;
+                  final List<String> currentSlots =
+                      isMorning ? _morningSlots : _afternoonSlots;
                   final String chosenSlot = currentSlots[_selectedTimeIndex];
-                  
+
                   // Tạo datetime cho appointment từ slot được chọn
-                  final DateTime slotTime = DateFormatter.parseSlotStartTime(dateObj, chosenSlot);
+                  final DateTime slotTime =
+                      DateFormatter.parseSlotStartTime(dateObj, chosenSlot);
 
                   Navigator.of(context).push(
                     MaterialPageRoute(
