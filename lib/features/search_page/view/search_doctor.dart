@@ -236,21 +236,28 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                 child: SizedBox(
                   width: double.infinity,
-                  height: 50,
                   child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(50),    // đảm bảo chiều cao tối thiểu
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,                              // padding trên/dưới
+                        horizontal: 16,                            // padding trái/phải
+                      ),
+                      textStyle: const TextStyle(fontSize: 16),    // kích thước chữ rõ ràng
+                    ),
                     onPressed: () {
-                      Navigator.pop(context);
                       setState(() {
                         _selectedSpecialtyName = tempName;
-                        _selectedSpecialtyId = tempId;
+                        _selectedSpecialtyId   = tempId;
                       });
-                      // Don't fetch doctors again, just apply filters
                       _applyFilters();
+                      Navigator.pop(context);
                     },
                     child: const Text('Áp dụng'),
                   ),
                 ),
               ),
+
             ],
           ),
         ),
@@ -390,7 +397,7 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            "${d.degree} • ${d.user?.username ?? 'Chưa tên'}",
+                                            "${d.user?.username ?? 'Chưa tên'}",
                                             style: const TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.w600),
@@ -398,6 +405,11 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
                                           const SizedBox(height: 4),
                                           Text(
                                             "${d.specialization?.name ?? 'Chưa rõ'} · ${d.experienceYears} năm",
+                                            style: TextStyle(
+                                                color: Colors.grey.shade700),
+                                          ),
+                                          Text(
+                                            "Bằng cấp: ${d.degree ?? 'Chưa rõ'}",
                                             style: TextStyle(
                                                 color: Colors.grey.shade700),
                                           ),

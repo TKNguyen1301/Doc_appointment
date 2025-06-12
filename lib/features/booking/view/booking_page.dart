@@ -395,33 +395,34 @@ class _BookingPageState extends State<BookingPage> {
                             foregroundColor: Colors.grey[700],
                             side: BorderSide(color: Colors.grey[300]!),
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 16), // thêm padding chuẩn
                           ),
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16),
-                            child: Text('Hủy'),
-                          ),
+                          child: const Text('Hủy'),
                         ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            _displayedMonth = DateTime(
-                                tempSelectedYear, tempSelectedMonth, 1);
+                            _displayedMonth = DateTime(tempSelectedYear, tempSelectedMonth, 1);
                             _generateDatesForMonth(_displayedMonth);
                             Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 16), // đảm bảo text không bị cắt
                           ),
                           child: const Text('Xác nhận'),
                         ),
                       ),
                     ],
                   ),
+
+
                 ],
               ),
             );
