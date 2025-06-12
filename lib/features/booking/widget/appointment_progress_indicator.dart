@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterproject/utils/constants/colors.dart';
 
 class AppointmentProgressIndicator extends StatelessWidget {
   final int currentStep; // 1, 2, 3
@@ -65,8 +66,8 @@ class AppointmentProgressIndicator extends StatelessWidget {
       textColor = Colors.green;
       circleChild = const Icon(Icons.check, size: 16, color: Colors.white);
     } else if (isActive) {
-      circleColor = Colors.blue;
-      textColor = Colors.blue;
+      circleColor = AppColors.primary;
+      textColor = AppColors.primary;
     }
 
     return Row(

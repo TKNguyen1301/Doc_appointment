@@ -97,12 +97,12 @@ class SpecialityCard extends StatelessWidget {
       height: 48,
       width: 48,
       decoration: BoxDecoration(
-        color: Colors.blue[100],
+        color: AppColors.primary,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(
         Icons.medical_services,
-        color: Colors.blue[600],
+        color: AppColors.primary,
         size: 24,
       ),
     );

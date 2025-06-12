@@ -10,7 +10,7 @@ import 'package:flutterproject/features/booking/widget/patient_profile_card.dart
 import 'package:flutterproject/features/booking/widget/extra_info_display.dart';
 import 'package:flutterproject/utils/formatters/date_formatter.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutterproject/utils/constants/colors.dart';
 class ConfirmationPage extends StatefulWidget {
   final Doctor doctor;
   final DateTime selectedDate;
@@ -114,7 +114,7 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.blue,
+        backgroundColor: AppColors.primary,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -232,7 +232,7 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
                 height: 55,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   onPressed: _isBooking ? null : _confirmBooking,

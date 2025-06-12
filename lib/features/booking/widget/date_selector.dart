@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterproject/utils/formatters/date_formatter.dart';
-
+import 'package:flutterproject/utils/constants/colors.dart';
 class DateSelector extends StatelessWidget {
   final DateTime displayedMonth;
   final List<Map<String, dynamic>> dates;
@@ -45,7 +45,7 @@ class DateSelector extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.calendar_month, color: Colors.blue),
+                const Icon(Icons.calendar_month, color: AppColors.primary),
                 const SizedBox(width: 8),
                 Text(monthLabel, style: const TextStyle(fontSize: 14)),
                 const Spacer(),
@@ -79,10 +79,10 @@ class DateSelector extends StatelessWidget {
                         width: 80,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
-                          color: isSelected ? Colors.blue : Colors.grey.shade50,
+                          color: isSelected ? AppColors.primary : Colors.grey.shade50,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: isSelected ? Colors.blue : Colors.grey.shade300,
+                            color: isSelected ? AppColors.primary : Colors.grey.shade300,
                           ),
                         ),
                         child: Column(

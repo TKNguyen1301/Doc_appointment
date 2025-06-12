@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterproject/features/home/model/doctor.dart';
 import 'package:flutterproject/features/home/view_model/doctor_controller.dart';
 import 'package:flutterproject/features/authentication/model_view/patient_controller.dart';
-
+import 'package:flutterproject/utils/constants/colors.dart';
 class DoctorSearchPage extends StatefulWidget {
   /// Nếu muốn filter ngay từ đầu theo chuyên khoa,
   /// truyền tên chuyên khoa vào `specialty`
@@ -180,7 +180,7 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
                           color: Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: selected ? Colors.blue : Colors.transparent,
+                            color: selected ? AppColors.primary : Colors.transparent,
                             width: 1.5,
                           ),
                         ),
@@ -213,7 +213,7 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
                                 tempName = spec['name'];
                                 tempId = v;
                               }),
-                              activeColor: Colors.blue,
+                              activeColor: AppColors.primary,
                             ),
                           ],
                         ),
@@ -253,7 +253,7 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.blue,
+        backgroundColor: AppColors.primary,
         leading: const BackButton(color: Colors.white),
         title: Container(
           height: 40,
@@ -406,7 +406,7 @@ class _DoctorSearchPageState extends State<DoctorSearchPage> {
                                         // Navigate to booking page
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.blue,
+                                        backgroundColor: AppColors.primary,
                                         foregroundColor: Colors.white,
                                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                       ),

@@ -12,6 +12,7 @@ import 'package:flutterproject/features/booking/widget/doctor_appointment_card.d
 import 'package:flutterproject/features/booking/widget/patient_info_section.dart';
 import 'package:flutterproject/features/booking/widget/date_selector.dart';
 import 'package:flutterproject/features/booking/widget/time_slot_section.dart';
+import 'package:flutterproject/utils/constants/colors.dart';
 import 'package:flutterproject/utils/formatters/date_formatter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -358,180 +359,6 @@ class _BookingPageState extends State<BookingPage> {
     );
   }
 
-  Future<void> _showExtraInfoModal() async {
-    final TextEditingController symptomController = TextEditingController(text: _extraInfoText);
-    List<XFile> pickedImages = _extraImages.map((file) => XFile(file.path)).toList();
-    final ImagePicker picker = ImagePicker();
-
-    await showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            bool canSubmit = symptomController.text.trim().isNotEmpty || pickedImages.isNotEmpty;
-
-            Future<void> pickImage() async {
-              if (pickedImages.length >= 5) return;
-              final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-              if (image != null) {
-                setModalState(() {
-                  pickedImages.add(image);
-                });
-              }
-            }
-
-            return Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-              ),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Expanded(
-                          child: Text(
-                            'Lý do thăm khám',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close, size: 24),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Triệu chứng',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 6),
-                    TextField(
-                      controller: symptomController,
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        hintText: 'Lý do khám, triệu chứng, trạng thái, tiền sử bệnh...',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: Colors.grey),
-                        ),
-                      ),
-                      onChanged: (value) {
-                        setModalState(() {});
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Toa thuốc, hình ảnh',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      'Toa (đơn) thuốc đang dùng gần đây, tối đa 5 hình ảnh, dung lượng không quá 15MB.',
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        for (var imgFile in pickedImages)
-                          Stack(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.file(
-                                  File(imgFile.path),
-                                  width: 70,
-                                  height: 70,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              Positioned(
-                                top: -6,
-                                right: -6,
-                                child: IconButton(
-                                  icon: const Icon(
-                                    Icons.cancel,
-                                    size: 20,
-                                    color: Colors.redAccent,
-                                  ),
-                                  onPressed: () {
-                                    setModalState(() {
-                                      pickedImages.remove(imgFile);
-                                    });
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        if (pickedImages.length < 5)
-                          GestureDetector(
-                            onTap: pickImage,
-                            child: Container(
-                              width: 70,
-                              height: 70,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.grey.shade300),
-                              ),
-                              child: const Icon(
-                                Icons.add,
-                                size: 30,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 55,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: canSubmit ? Colors.blue : Colors.grey.shade300,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        ),
-                        onPressed: canSubmit
-                            ? () {
-                                setState(() {
-                                  _extraInfoText = symptomController.text.trim();
-                                  _extraImages = pickedImages.map((xfile) => File(xfile.path)).toList();
-                                });
-                                Navigator.of(context).pop();
-                              }
-                            : null,
-                        child: Text(
-                          'Thêm thông tin',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: canSubmit ? Colors.white : Colors.grey.shade600,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
   void _showLoginRequiredDialog() {
     showDialog(
       context: context,
@@ -583,7 +410,7 @@ class _BookingPageState extends State<BookingPage> {
       return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Colors.blue,
+          backgroundColor: AppColors.primary,
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -600,7 +427,7 @@ class _BookingPageState extends State<BookingPage> {
       return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Colors.blue,
+          backgroundColor: AppColors.primary,
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -634,7 +461,7 @@ class _BookingPageState extends State<BookingPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.blue,
+        backgroundColor: AppColors.primary,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -714,64 +541,22 @@ class _BookingPageState extends State<BookingPage> {
                   
                   const SizedBox(height: 16),
                   
-                  // Chỉ hiển thị phần thông tin bổ sung khi đã đăng nhập
                   if (_isUserLoggedIn) ...[
                     const Text(
                       'Thông tin bổ sung (không bắt buộc)',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: 8),
-                    if (_extraInfoText.isEmpty && _extraImages.isEmpty)
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Colors.grey.shade300),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          ),
-                          onPressed: _showExtraInfoModal,
-                          child: const Text('Tôi muốn gửi thêm thông tin'),
-                        ),
-                      )
-                    else
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
+                    TextField(
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        hintText: 'Lý do khám, triệu chứng...',
+                        border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (_extraInfoText.isNotEmpty) ...[
-                              const Text('Lý do thăm khám:', style: TextStyle(fontWeight: FontWeight.w500)),
-                              const SizedBox(height: 4),
-                              Text(_extraInfoText),
-                              const SizedBox(height: 8),
-                            ],
-                            if (_extraImages.isNotEmpty) ...[
-                              const Text('Ảnh đính kèm:', style: TextStyle(fontWeight: FontWeight.w500)),
-                              const SizedBox(height: 4),
-                              Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: _extraImages.map((file) {
-                                  return ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Image.file(file, width: 70, height: 70, fit: BoxFit.cover),
-                                  );
-                                }).toList(),
-                              ),
-                              const SizedBox(height: 8),
-                            ],
-                            TextButton(
-                              onPressed: _showExtraInfoModal,
-                              child: const Text('Chỉnh sửa'),
-                            ),
-                          ],
-                        ),
                       ),
+                      onChanged: (val) => setState(() => _extraInfoText = val.trim()),
+                    ),
                   ],
                   
                   const SizedBox(height: 80),
@@ -788,7 +573,7 @@ class _BookingPageState extends State<BookingPage> {
               height: 55,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
                 onPressed: () {

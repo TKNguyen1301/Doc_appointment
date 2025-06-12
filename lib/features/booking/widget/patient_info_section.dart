@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterproject/features/authentication/model_view/patient_controller.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutterproject/utils/constants/colors.dart';
 class PatientInfoSection extends StatelessWidget {
   final bool isUserLoggedIn;
   final Map<String, String> patientProfile;
@@ -127,7 +127,7 @@ class PatientInfoSection extends StatelessWidget {
   Widget _buildInfoRow(String label, String value, IconData icon) {
     return Row(
       children: [
-        Icon(icon, color: Colors.blue, size: 16),
+        Icon(icon, color: AppColors.primary, size: 16),
         const SizedBox(width: 8),
         Text(label,
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),

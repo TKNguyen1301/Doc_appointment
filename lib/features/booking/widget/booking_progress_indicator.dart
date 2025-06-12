@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutterproject/utils/constants/colors.dart';
 class BookingProgressIndicator extends StatelessWidget {
   const BookingProgressIndicator({Key? key}) : super(key: key);
 
@@ -20,7 +20,7 @@ class BookingProgressIndicator extends StatelessWidget {
                   height: 24,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.blue,
+                    color: AppColors.primary,
                   ),
                   alignment: Alignment.center,
                   child: const Text(
@@ -32,7 +32,7 @@ class BookingProgressIndicator extends StatelessWidget {
                 const SizedBox(width: 6),
                 const Text(
                   'Chọn lịch khám',
-                  style: TextStyle(fontSize: 13, color: Colors.blue),
+                  style: TextStyle(fontSize: 13, color: AppColors.primary),
                 ),
               ],
             ),
