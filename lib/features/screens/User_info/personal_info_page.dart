@@ -1,3 +1,4 @@
+// personal_info_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
@@ -19,7 +20,6 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
   @override
   void initState() {
     super.initState();
-    // Ensure profile is loaded
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final controller = Provider.of<PatientController>(context, listen: false);
       if (controller.profile == null && !controller.isLoading) {
@@ -30,7 +30,6 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Sử dụng provider đã có thay vì tạo mới
     return Scaffold(
       backgroundColor: const Color(0xfff0f4ff),
       appBar: AppBar(
@@ -45,7 +44,6 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
           if (controller.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-          
           if (controller.profile == null) {
             return Center(
               child: Column(
@@ -61,7 +59,6 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
               ),
             );
           }
-          
           return _buildProfile(context, controller.profile!);
         },
       ),
@@ -69,12 +66,11 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
   }
 
   Widget _buildProfile(BuildContext context, Patient profile) {
-    final user = profile.user;
+    final user = profile.user!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          // Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -93,14 +89,14 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                 ],
               ),
               TextButton.icon(
-                onPressed: () {
-                  // Navigate to edit page if needed
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => EditProfilePage(),
-                  //   ),
-                  // );
+                onPressed: () async {
+                  // Navigate to edit page and wait for result
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const EditProfilePage()),
+                  );
+                  // After returning, reload profile data
+                  Provider.of<PatientController>(context, listen: false).fetchProfile();
                 },
                 icon: const Icon(Icons.edit, size: 18),
                 label: const Text('Điều chỉnh', style: TextStyle(fontSize: 15)),
@@ -108,7 +104,6 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
             ],
           ),
           const SizedBox(height: 16),
-          // Info Card
           Card(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             elevation: 4,
@@ -120,7 +115,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                   _buildRow(context, '🆔 Mã bệnh nhân', profile.patientId.toString(), true),
                   _buildRow(context, '🏥 Mã BHYT', profile.insuranceNumber ?? 'Chưa cập nhật', true),
                   _buildRow(context, '📄 CCCD', profile.idNumber ?? 'Chưa cập nhật', true),
-                  _buildRow(context, '👤 Tên đăng nhập', user?.username ?? 'Chưa cập nhật', false),
+                  _buildRow(context, '👤 Tên đăng nhập', user.username, false),
                   _buildRow(context, '📞 SĐT', profile.phoneNumber ?? 'Chưa cập nhật', false),
                   _buildRow(
                     context,
@@ -139,7 +134,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                     false,
                   ),
                   _buildRow(context, '🏠 Địa chỉ', profile.address ?? 'Chưa cập nhật', false),
-                  _buildRow(context, '📧 Email', user?.email ?? 'Chưa cập nhật', false),
+                  _buildRow(context, '📧 Email', user.email, false),
                 ],
               ),
             ),

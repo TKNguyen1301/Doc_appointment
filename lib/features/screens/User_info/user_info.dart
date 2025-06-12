@@ -1,3 +1,4 @@
+// user_info.dart (AccountPage)
 import 'package:flutter/material.dart';
 import 'package:flutterproject/features/authentication/screens.onboarding/login/login.dart';
 import 'package:get/get.dart';
@@ -34,7 +35,11 @@ class _AccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
     const borderRadius = BorderRadius.all(Radius.circular(16));
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 6c7f626 (Finish User_info)
     return Scaffold(
       backgroundColor: const Color(0xFFF0F2F5),
       body: Consumer<PatientController>(
@@ -81,8 +86,8 @@ class _AccountPageState extends State<AccountPage> {
                               child: CircleAvatar(
                                 radius: 30,
                                 backgroundImage: NetworkImage(
-                                  patientController.profile!.user?.avatar ?? 
-                                  'https://static.vecteezy.com/system/resources/previews/020/911/740/non_2x/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png'
+                                  patientController.profile!.user?.avatar ??
+                                      'https://static.vecteezy.com/system/resources/previews/020/911/740/non_2x/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png',
                                 ),
                               ),
                             ),
@@ -132,13 +137,15 @@ class _AccountPageState extends State<AccountPage> {
                           icon: Icons.person,
                           title: 'Thông tin cá nhân',
                           color: Colors.blue,
-                          onTap: () {
-                            Navigator.push(
+                          onTap: () async {
+                            await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (_) => const PersonalInfoPage(),
                               ),
                             );
+                            // reload after return
+                            Provider.of<PatientController>(context, listen: false).fetchProfile();
                           },
                         ),
                         const Divider(height: 1),
@@ -146,13 +153,14 @@ class _AccountPageState extends State<AccountPage> {
                           icon: Icons.lock,
                           title: 'Đổi mật khẩu',
                           color: Colors.orange,
-                          onTap: () {
-                            Navigator.push(
+                          onTap: () async {
+                            await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (_) => const ChangePasswordPage(),
                               ),
                             );
+                            // optionally reload if password affects profile
                           },
                         ),
                         const Divider(height: 1),
@@ -294,11 +302,13 @@ class _AccountPageState extends State<AccountPage> {
           TextButton(
             onPressed: () async {
               Navigator.of(ctx).pop();
-
               if (widget.onLogout != null) {
                 widget.onLogout!();
               } else {
+<<<<<<< HEAD
                 // Fallback logout logic - chỉ logout, không navigate
+=======
+>>>>>>> 6c7f626 (Finish User_info)
                 final patientController = Provider.of<PatientController>(context, listen: false);
                 await patientController.logout();
                 
