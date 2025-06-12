@@ -556,58 +556,62 @@ class AppointmentController {
     }
   }
 
-  /// Get user appointments (from patient controller)
-  Future<List<Appointment>> getUserAppointments({String? token}) async {
-    // Update: Backend DOES have /api/patient/appointments endpoint
-    // From patient service: getPatientAppointments function exists
-    final patientEndpoint = 'http://localhost:5001/api/patient/appointments';
-    final uri = Uri.parse(patientEndpoint);
+  Future<List<Appointment>> getUserAppointments({
+  String? token,
+  int pageSize = 50, // số bản ghi mỗi trang
+}) async {
+  const patientEndpoint = 'http://localhost:5001/api/patient/appointments';
+  final List<Appointment> allAppointments = [];
+  int page = 1;
+
+  while (true) {
+    // Xây dựng URI với phân trang
+    final uri = Uri.parse(patientEndpoint).replace(queryParameters: {
+      'page': page.toString(),
+      'limit': pageSize.toString(),
+    });
 
     final headers = {
       HttpHeaders.contentTypeHeader: 'application/json',
       if (token != null) HttpHeaders.authorizationHeader: 'Bearer $token',
     };
 
-    _logApiCall('GET', patientEndpoint, headers: headers);
+    _logApiCall('GET', uri.toString(), headers: headers);
+    final response = await _client.get(uri, headers: headers);
+    _logApiResponse(uri.toString(), response.statusCode, response.body);
 
-    try {
-      final response = await _client.get(uri, headers: headers);
-      _logApiResponse(patientEndpoint, response.statusCode, response.body);
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final appointmentsList = data['appointments'] as List? ?? [];
-        print(
-            '✅ Successfully fetched ${appointmentsList.length} user appointments');
-
-        // Parse appointments with better error handling
-        final List<Appointment> appointments = [];
-        for (int i = 0; i < appointmentsList.length; i++) {
-          try {
-            final appointmentData = appointmentsList[i] as Map<String, dynamic>;
-            final appointment = Appointment.fromJson(appointmentData);
-            appointments.add(appointment);
-          } catch (e) {
-            print('⚠️ Warning: Failed to parse appointment at index $i: $e');
-            print('📄 Raw appointment data: ${appointmentsList[i]}');
-            // Continue with other appointments instead of failing completely
-          }
-        }
-
-        print(
-            '✅ Successfully parsed ${appointments.length} out of ${appointmentsList.length} appointments');
-        return appointments;
-      }
-
-      _handleApiError(patientEndpoint, response);
-      return []; // This line won't be reached due to exception above
-    } catch (e) {
-      if (e is ApiException) rethrow;
-      print('❌ Network Error: $e');
-      throw ApiException('Network error occurred: $e',
-          endpoint: patientEndpoint);
+    if (response.statusCode != 200) {
+      _handleApiError(uri.toString(), response);
     }
+
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    final List<dynamic> pageList = data['appointments'] as List<dynamic>? ?? [];
+
+    // Chuyển thành Appointment
+    final List<Appointment> appointmentsPage = [];
+    for (var i = 0; i < pageList.length; i++) {
+      try {
+        appointmentsPage.add(
+          Appointment.fromJson(pageList[i] as Map<String, dynamic>),
+        );
+      } catch (e) {
+        print('⚠️ Warning: Failed to parse at index $i: $e');
+      }
+    }
+
+    // Thêm vào kết quả chung
+    allAppointments.addAll(appointmentsPage);
+
+    // Nếu trang này không đủ pageSize, coi như đã hết
+    if (appointmentsPage.length < pageSize) break;
+
+    page++;
   }
+
+  print('✅ Đã fetch tổng cộng ${allAppointments.length} lịch hẹn');
+  return allAppointments;
+}
+
 
   /// Get doctor appointments for specific user
   Future<List<Appointment>> getDoctorAppointments(int userId,

@@ -367,14 +367,14 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
                     _formatBookingSource(
                         _getStringValue(displayData['booking_source']))),
               ],
-              if (_getStringValue(displayData['arrival_status'])?.isNotEmpty ==
-                  true) ...[
-                const SizedBox(height: 12),
-                _infoRow(
-                    'Trạng thái có mặt',
-                    _formatArrivalStatus(
-                        _getStringValue(displayData['arrival_status']))),
-              ],
+              // if (_getStringValue(displayData['arrival_status'])?.isNotEmpty ==
+              //     true) ...[
+              //   const SizedBox(height: 12),
+              //   _infoRow(
+              //       'Trạng thái có mặt',
+              //       _formatArrivalStatus(
+              //           _getStringValue(displayData['arrival_status']))),
+              // ],
               if (displayData['checkin_time'] != null) ...[
                 const SizedBox(height: 12),
                 _infoRow(
