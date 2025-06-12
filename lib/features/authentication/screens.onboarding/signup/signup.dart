@@ -1,152 +1,165 @@
 import 'package:flutter/material.dart';
-import 'package:flutterproject/features/authentication/screens.onboarding/signup/verify_email.dart';
+import 'package:flutterproject/features/authentication/screens.onboarding/login/login.dart';
 import 'package:flutterproject/utils/constants/colors.dart';
-import 'package:flutterproject/utils/constants/image_strings.dart';
 import 'package:flutterproject/utils/constants/sizes.dart';
 import 'package:flutterproject/utils/constants/text_strings.dart';
 import 'package:flutterproject/utils/helpers/helper_functions.dart';
 import 'package:get/get.dart';
-import 'package:get/get_utils/src/extensions/string_extensions.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:provider/provider.dart';
+import 'package:flutterproject/features/authentication/model_view/patient_controller.dart';
+
+class SignupController extends GetxController {
+  final isPasswordHidden = true.obs;
+}
 
 class SignupScreen extends StatelessWidget {
-  const SignupScreen({super.key});
+  SignupScreen({Key? key}) : super(key: key);
+
+  final SignupController controller = Get.put(SignupController());
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _usernameCtrl = TextEditingController();
+  final TextEditingController _emailCtrl = TextEditingController();
+  final TextEditingController _passwordCtrl = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final dark = AppHelperFunctions.isDarkMode(context);
-    return  Scaffold(
-      appBar: AppBar(),
+    final patientController = Provider.of<PatientController>(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: dark ? Colors.black : AppColors.primary,
+        foregroundColor: Colors.white,
+      ),
       body: SingleChildScrollView(
-        child:  Padding(
+        child: Padding(
           padding: const EdgeInsets.all(AppSizes.defaultSpace),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(AppTexts.signupTitle, style: Theme.of(context).textTheme.headlineMedium),
+              Text(
+                AppTexts.signupTitle,
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
               const SizedBox(height: AppSizes.spaceBtwSections),
-
-              //Form
               Form(
+                key: _formKey,
                 child: Column(
                   children: [
-                    Row(
-                      children: [
-                        //First, Last Name
-                        Expanded(
-                          child: TextFormField(
-                            expands: false,
-                            decoration: const  InputDecoration(labelText: AppTexts.firstName, prefixIcon: Icon(Iconsax.user)),
-                          ),
-                        ),
-                        const SizedBox(width: AppSizes.spaceBtwInputFields),
-                        Expanded(
-                          child: TextFormField(
-                            expands: false,
-                            decoration: const  InputDecoration(labelText: AppTexts.firstName, prefixIcon: Icon(Iconsax.user)),
-                          ),
-                        ),
-                      ],
+                    TextFormField(
+                      controller: _usernameCtrl,
+                      decoration: const InputDecoration(
+                        labelText: AppTexts.username,
+                        prefixIcon: Icon(Iconsax.user_edit),
+                      ),
+                      validator: (value) =>
+                          (value == null || value.trim().isEmpty)
+                              ? 'Vui lòng nhập tên người dùng'
+                              : null,
                     ),
-                    // Username
                     const SizedBox(height: AppSizes.spaceBtwInputFields),
                     TextFormField(
-                      expands: false,
-                      decoration: const  InputDecoration(labelText: AppTexts.username, prefixIcon: Icon(Iconsax.user_edit)),
+                      controller: _emailCtrl,
+                      decoration: const InputDecoration(
+                        labelText: AppTexts.email,
+                        prefixIcon: Icon(Iconsax.direct),
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Vui lòng nhập email';
+                        }
+                        if (!value.contains('@')) {
+                          return 'Email không hợp lệ';
+                        }
+                        return null;
+                      },
                     ),
-                    // Email
                     const SizedBox(height: AppSizes.spaceBtwInputFields),
-                    TextFormField(
-                      decoration: const  InputDecoration(labelText: AppTexts.email, prefixIcon: Icon(Iconsax.direct)),
-                    ),
-                    // Phone Number
-                    const SizedBox(height: AppSizes.spaceBtwInputFields),
-                    TextFormField(
-                      decoration: const  InputDecoration(labelText: AppTexts.phoneNo, prefixIcon: Icon(Iconsax.call)),
-                    ),
-                    const SizedBox(height: AppSizes.spaceBtwInputFields),
-                    //Password
                     Obx(
                       () => TextFormField(
-                        obscureText: true,
-                        decoration: const InputDecoration(
+                        controller: _passwordCtrl,
+                        obscureText: controller.isPasswordHidden.value,
+                        decoration: InputDecoration(
                           labelText: AppTexts.password,
                           prefixIcon: const Icon(Iconsax.password_check),
-                          suffixIcon: Icon(Iconsax.eye_slash),
+                          suffixIcon: IconButton(
+                            icon: Icon(controller.isPasswordHidden.value
+                                ? Iconsax.eye_slash
+                                : Iconsax.eye),
+                            onPressed: () => controller.isPasswordHidden.value =
+                                !controller.isPasswordHidden.value,
+                          ),
                         ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Vui lòng nhập mật khẩu';
+                          }
+                          if (value.length < 6) {
+                            return 'Mật khẩu phải có ít nhất 6 ký tự';
+                          }
+                          return null;
+                        },
                       ),
-                    ),        
-                    const SizedBox(height: AppSizes.spaceBtwSections),
-                    // Privacy,terms
-                    Row(
-                      children: [
-                        SizedBox(width: 24, height: 24, child: Checkbox(value: true, onChanged: (value) {},activeColor: const Color(0xFF98FF98))),
-                        const SizedBox(width: AppSizes.spaceBtwItems),
-                        Text.rich(
-                          TextSpan(children: [
-                            TextSpan(text: AppTexts.iAgreeTo, style: Theme.of(context).textTheme.bodySmall),
-                            TextSpan(text: AppTexts.privacyPolicy, style: Theme.of(context).textTheme.bodyMedium!.apply(
-                              color: dark ? AppColors.white : AppColors.primary,
-                              decoration: TextDecoration.underline,
-                              decorationColor: dark ? AppColors.white : AppColors.primary,
-                            )),
-                            TextSpan(text: AppTexts.and, style: Theme.of(context).textTheme.bodySmall),
-                            TextSpan(text: AppTexts.termsOfUse, style: Theme.of(context).textTheme.bodyMedium!.apply(
-                              color: dark ? AppColors.white : AppColors.primary,
-                              decoration: TextDecoration.underline,
-                              decorationColor: dark ? AppColors.white : AppColors.primary,
-                            )),
-                          ]),
-                        ),
-                      ],
                     ),
                     const SizedBox(height: AppSizes.spaceBtwSections),
-                    // Sign up Button
-                    SizedBox(width: double.infinity, child: ElevatedButton(style:ElevatedButton.styleFrom(backgroundColor:  Color(0xFF98FF98),foregroundColor: Colors.black,side: BorderSide(color: Colors.white, width: 0)) ,onPressed: () => const VerifyEmailScreen(), child: const Text(AppTexts.createAccount)))
-                  ],
-                )
-              ),
-              const SizedBox(height: AppSizes.spaceBtwSections),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: patientController.isLoading
+                          ? ElevatedButton(
+                              onPressed: null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                                minimumSize: const Size(double.infinity, 48),
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                              ),
+                              child: const CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            )
+                          : ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                                side: const BorderSide(color: Colors.white),
+                                minimumSize: const Size(double.infinity, 48),
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                              ),
+                              onPressed: () async {
+                                if (_formKey.currentState?.validate() != true) return;
+                                try {
+                                  await patientController.register(
+                                    _usernameCtrl.text.trim(),
+                                    _passwordCtrl.text.trim(),
+                                    _emailCtrl.text.trim(),
+                                  );
+                                  // Thông báo đăng ký thành công
+                                  Get.snackbar(
+                                    'Đăng ký thành công',
+                                    '',
+                                    snackPosition: SnackPosition.BOTTOM,
+                                  );
+                                  Future.delayed(const Duration(seconds: 1), () {
+                                    Get.offAll(() => const LoginScreen());
+                                  });
+                                } catch (e) {
+                                  Get.snackbar(
+                                    'Đăng ký thất bại',
+                                    e.toString(),
+                                    snackPosition: SnackPosition.BOTTOM,
+                                  );
+                                }
+                              },
+                              child: const Text(AppTexts.createAccount),
+                            ),
+                    ),
 
-              //Divider
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Flexible(child: Divider(color: dark ? AppColors.darkGrey: AppColors.grey, thickness: 0.5, indent: 60, endIndent: 5)),
-                  Text(AppTexts.orSignInWith.capitalize!, style: Theme.of(context).textTheme.labelMedium),
-                  Flexible(child: Divider(color: dark ? AppColors.darkGrey: AppColors.grey, thickness: 0.5, indent: 6, endIndent: 60)),
-                ],
+                  ],
+                ),
               ),
-              const SizedBox(height: AppSizes.spaceBtwSections),
-              
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(border: Border.all(color: AppColors.grey),borderRadius: BorderRadius.circular(100)),
-                    child: IconButton(
-                      onPressed: (){}, 
-                      icon: const Image(
-                        width: AppSizes.iconMd,
-                        height: AppSizes.iconMd,
-                        image: AssetImage(AppImages.google),
-                      )
-                    ),
-                  ),
-                  const SizedBox(width: AppSizes.spaceBtwItems),
-                  Container(
-                    decoration: BoxDecoration(border: Border.all(color: AppColors.grey),borderRadius: BorderRadius.circular(100)),
-                    child: IconButton(
-                      onPressed: (){}, 
-                      icon: const Image(
-                        width: AppSizes.iconMd,
-                        height: AppSizes.iconMd,
-                        image: AssetImage(AppImages.facebook),
-                      )
-                    ),
-                  ),
-                ],
-              )
             ],
           ),
         ),

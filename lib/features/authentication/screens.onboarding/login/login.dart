@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:flutterproject/common/styles/spacing_styles.dart';
-import 'package:flutterproject/features/authentication/screens.onboarding/password_configuration/forget_password.dart';
 import 'package:flutterproject/features/authentication/screens.onboarding/signup/signup.dart';
 import 'package:flutterproject/navigation_menu.dart';
 import 'package:flutterproject/utils/constants/colors.dart';
@@ -11,7 +11,7 @@ import 'package:flutterproject/features/authentication/model_view/patient_contro
 import 'package:get/get.dart';
 import 'package:get/get_utils/src/extensions/string_extensions.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:provider/provider.dart'; // Add this import
+import 'package:provider/provider.dart';
 import '../../../../utils/constants/sizes.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -25,7 +25,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  // Remove this line: final PatientController _patientController = Get.put(PatientController());
   bool _isLoading = false;
   bool _obscurePassword = true;
 
@@ -33,20 +32,15 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
     try {
-      // Use Provider instead of Get
       final patientController = Provider.of<PatientController>(context, listen: false);
-      
       await patientController.login(
         _emailController.text.trim(),
         _passwordController.text,
       );
-
-      // Fetch profile after successful login
       await patientController.fetchProfile();
 
-      // Navigate back or to navigation menu
       if (Navigator.canPop(context)) {
-        Get.back(); // Quay về trang trước
+        Get.back();
       } else {
         Get.offAll(() => const NavigationMenu());
       }
@@ -79,28 +73,30 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: AppSpacingStyles.paddingWithAppBarHeight,
           child: Column(
             children: [
-              // Logo & Titles
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Image(
+              // Logo & Titles — now centered
+              Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      "assets/assets_frontend/logo.svg",  // ví dụ: "assets/images/logo.svg"
                       height: 150,
-                      image: AssetImage(
-                        dark ? AppImages.darkAppLogo : AppImages.lightAppLogo,
-                      ),
                     ),
-                  ),
-                  Text(
-                    AppTexts.loginTitle,
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                  const SizedBox(height: AppSizes.sm),
-                  Text(
-                    AppTexts.loginSubTitle,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ],
+                    const SizedBox(height: AppSizes.sm),
+                    Text(
+                      AppTexts.loginTitle,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: AppSizes.sm),
+                    Text(
+                      AppTexts.loginSubTitle,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
 
               // Form
@@ -117,10 +113,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: const InputDecoration(
-                          prefixIcon: Icon(Iconsax.direct_right, color: Color(0xFF98FF98)),
+                          prefixIcon: Icon(Iconsax.direct_right, color: AppColors.primary),
                           labelText: AppTexts.email,
                           enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF98FF98)),
+                            borderSide: BorderSide(color: AppColors.primary),
                           ),
                         ),
                         validator: (value) {
@@ -140,15 +136,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         controller: _passwordController,
                         obscureText: _obscurePassword,
                         decoration: InputDecoration(
-                          prefixIcon: const Icon(Iconsax.password_check, color: Color(0xFF98FF98)),
+                          prefixIcon: const Icon(Iconsax.password_check, color: AppColors.primary),
                           labelText: AppTexts.password,
                           enabledBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF98FF98)),
+                            borderSide: BorderSide(color: AppColors.primary),
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword ? Iconsax.eye_slash : Iconsax.eye,
-                              color: const Color(0xFF98FF98),
+                              color: AppColors.primary,
                             ),
                             onPressed: () => setState(() {
                               _obscurePassword = !_obscurePassword;
@@ -162,46 +158,25 @@ class _LoginScreenState extends State<LoginScreen> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: AppSizes.spaceBtwInputFields / 2),
-
-                      // Remember & Forget
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: true,
-                                onChanged: (_) {},
-                                activeColor: const Color(0xFF98FF98),
-                              ),
-                              const Text(AppTexts.rememberMe),
-                            ],
-                          ),
-                          TextButton(
-                            onPressed: () => Get.to(() => const ForgetPassword()),
-                            child: const Text(AppTexts.forgetPassword),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: AppSizes.spaceBtwSections),
+                      const SizedBox(height: AppSizes.spaceBtwInputFields * 2),
 
                       // Sign In Button
                       SizedBox(
                         width: double.infinity,
-                        height: 48,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF98FF98),
+                            backgroundColor: AppColors.primary,
                             foregroundColor: Colors.black,
+                            minimumSize: const Size.fromHeight(48),
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
                           ),
                           onPressed: _isLoading ? null : _login,
                           child: _isLoading
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
-                              : const Text(AppTexts.signIn),
+                              ? const CircularProgressIndicator(color: Colors.white)
+                              : const Text(
+                                  AppTexts.signIn,
+                                  textAlign: TextAlign.center,
+                                ),
                         ),
                       ),
 
@@ -214,81 +189,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(
-                              color: Color(0xFF98FF98),
+                              color: AppColors.primary,
                               width: 1,
                             ),
                           ),
-                          onPressed: () => Get.to(() => const SignupScreen()),
+                          onPressed: () => Get.to(() => SignupScreen()),
                           child: const Text(AppTexts.createAccount),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-
-              // Or Divider
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: Divider(
-                      color: dark ? AppColors.darkGrey : AppColors.grey,
-                      thickness: 0.5,
-                      indent: 60,
-                      endIndent: 5,
-                    ),
-                  ),
-                  Text(
-                    AppTexts.orSignInWith.capitalize!,
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
-                  Flexible(
-                    child: Divider(
-                      color: dark ? AppColors.darkGrey : AppColors.grey,
-                      thickness: 0.5,
-                      indent: 6,
-                      endIndent: 60,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSizes.spaceBtwSections),
-
-              // Social Buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.grey),
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: IconButton(
-                      onPressed: () {},
-                      icon: const Image(
-                        width: AppSizes.iconMd,
-                        height: AppSizes.iconMd,
-                        image: AssetImage(AppImages.google),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSizes.spaceBtwItems),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.grey),
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: IconButton(
-                      onPressed: () {},
-                      icon: const Image(
-                        width: AppSizes.iconMd,
-                        height: AppSizes.iconMd,
-                        image: AssetImage(AppImages.facebook),
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ],
           ),

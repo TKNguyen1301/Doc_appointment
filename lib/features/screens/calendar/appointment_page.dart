@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterproject/features/screens/calendar/appointment_data.dart';
 import 'appointment_detail_page.dart';  // Import detail page
-
+import 'package:flutterproject/utils/constants/colors.dart';
 /// Trang hiển thị lịch khám với bộ lọc trạng thái, ngày và payment status, và chuyển sang chi tiết
 class AppointmentPage extends StatefulWidget {
   const AppointmentPage({Key? key}) : super(key: key);
@@ -98,16 +98,16 @@ class _AppointmentPageState extends State<AppointmentPage> {
                     return Container(
                       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                       decoration: BoxDecoration(
-                        color: sel ? Colors.blue.shade50 : Colors.white,
+                        color: sel ? AppColors.primary : Colors.white,
                         border: Border.all(
-                            color: sel ? Colors.blue : Colors.grey.shade300),
+                            color: sel ? AppColors.primary : Colors.grey.shade300),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: RadioListTile<String>(
                         title: Text(s),
                         value: s,
                         groupValue: temp,
-                        activeColor: Colors.blue,
+                        activeColor: AppColors.primary,
                         onChanged: (v) => setModalState(() => temp = v!),
                       ),
                     );
@@ -445,7 +445,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
         return Colors.green;
       case 'Chờ khám':
       case 'Chờ xác nhận':
-        return Colors.blue;
+        return AppColors.primary;
       default:
         return Colors.grey;
     }

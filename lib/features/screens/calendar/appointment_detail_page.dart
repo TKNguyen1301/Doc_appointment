@@ -1,8 +1,8 @@
 // appointment_detail_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutterproject/features/screens/calendar/appointment_data.dart';
-import 'package:flutterproject/features/screens/User_info/user_data.dart';
-
+// import 'package:flutterproject/features/screens/User_info/user_data.dart';
+import 'package:flutterproject/utils/constants/colors.dart';
 /// Chi tiết phiếu khám (Phiếu khám)
 class AppointmentDetailPage extends StatefulWidget {
   final Appointment appointment;
@@ -120,11 +120,11 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
                       children: [
                         const Text('Thông tin bệnh nhân', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         const Divider(height: 20),
-                        _infoRow('Mã bệnh nhân', currentUser.patientId),
+                        // _infoRow('Mã bệnh nhân', currentUser.patientId),
                         const SizedBox(height: 8),
-                        _infoRow('Họ và tên', currentUser.name),
+                        // _infoRow('Họ và tên', currentUser.name),
                         const SizedBox(height: 8),
-                        _infoRow('Điện thoại', currentUser.phone),
+                        // _infoRow('Điện thoại', currentUser.phone),
                         const SizedBox(height: 12),
                         Align(
                           alignment: Alignment.centerRight,
@@ -273,7 +273,7 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
                 children: const [
                   Text('Tổng đài hỗ trợ chăm sóc khách hàng', style: TextStyle(color: Colors.grey)),
                   SizedBox(height: 4),
-                  Text('1900-2805', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
+                  Text('1900-2805', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
                 ],
               ),
             ],
@@ -382,7 +382,7 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
       case 'Hoàn thành':
         return Colors.green;
       case 'Chờ khám':
-        return Colors.blue;
+        return AppColors.primary;
       case 'Đã hủy':
         return Colors.orange;
       default:

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutterproject/utils/constants/colors.dart';
 class PatientProfileCard extends StatelessWidget {
   final String title;
   final Map<String, String> patientProfile;
@@ -50,7 +50,7 @@ class PatientProfileCard extends StatelessWidget {
                       'Xem chi tiết',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.blue.shade700,
+                        color: AppColors.primary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

@@ -161,34 +161,6 @@ class _DoctorListSectionState extends State<DoctorListSection> {
                 },
               ),
             ),
-
-          const SizedBox(height: 24),
-
-          // Nút "More"
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size(120, 10), // Tăng chiều rộng và chiều cao
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-              backgroundColor: Colors.blue.shade100,
-              foregroundColor: Colors.blue.shade900,
-              elevation: 2, // Thêm chút độ nổi
-              shadowColor: Colors.blue.shade200, // Màu bóng nhẹ
-            ),
-            onPressed: () {
-              // TODO: Thêm hành động khi nhấn "More"
-            },
-            child: const Text(
-              'More',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 1,
-              ),
-            ),
-          ),
         ],
       ),
     );

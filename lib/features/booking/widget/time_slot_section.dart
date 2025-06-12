@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterproject/utils/formatters/date_formatter.dart';
-
+import 'package:flutterproject/utils/constants/colors.dart';
 class TimeSlotsSection extends StatelessWidget {
   final String selectedSession;
   final int selectedTimeIndex;
@@ -51,9 +51,9 @@ class TimeSlotsSection extends StatelessWidget {
                   onTap: (index) {
                     onSessionChanged(index == 0 ? 'morning' : 'afternoon');
                   },
-                  labelColor: Colors.blue,
+                  labelColor: AppColors.primary,
                   unselectedLabelColor: Colors.grey.shade600,
-                  indicatorColor: Colors.blue,
+                  indicatorColor: AppColors.primary,
                   tabs: const [
                     Tab(text: 'Buổi sáng'),
                     Tab(text: 'Buổi chiều'),
@@ -144,13 +144,13 @@ class TimeSlotsSection extends StatelessWidget {
             // Nếu slot đã disabled, override selected state
             final Color borderColor = isDisabled
                 ? Colors.grey.shade400
-                : (isSlotSelected ? Colors.blue : Colors.grey.shade300);
+                : (isSlotSelected ? AppColors.primary : Colors.grey.shade300);
             final Color textColor = isDisabled
                 ? Colors.grey.shade400
                 : (isSlotSelected ? Colors.white : Colors.black87);
             final Color bgColor = isDisabled 
                 ? Colors.grey.shade200 
-                : (isSlotSelected ? Colors.blue : Colors.white);
+                : (isSlotSelected ? AppColors.primary : Colors.white);
 
             return GestureDetector(
               onTap: () {
@@ -167,7 +167,7 @@ class TimeSlotsSection extends StatelessWidget {
                   ),
                   boxShadow: isSlotSelected ? [
                     BoxShadow(
-                      color: Colors.blue.withOpacity(0.3),
+                      color: AppColors.primary.withOpacity(0.3),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),

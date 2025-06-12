@@ -47,6 +47,7 @@ class _AccountPageState extends State<AccountPage> {
           
           // Nếu đã đăng nhập, hiển thị thông tin user
           return SingleChildScrollView(
+            padding: const EdgeInsets.only(top: 50),
             child: Column(
               children: [
                 const SizedBox(height: 16),
@@ -63,7 +64,7 @@ class _AccountPageState extends State<AccountPage> {
                     borderRadius: borderRadius,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.blue.withOpacity(0.2),
+                        color: AppColors.primary.withOpacity(0.2),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       )
@@ -132,7 +133,7 @@ class _AccountPageState extends State<AccountPage> {
                         _buildTile(
                           icon: Icons.person,
                           title: 'Thông tin cá nhân',
-                          color: Colors.blue,
+                          color: AppColors.primary,
                           onTap: () async {
                             await Navigator.push(
                               context,
@@ -218,6 +219,8 @@ class _AccountPageState extends State<AccountPage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
+                  minimumSize: const Size(double.infinity, 48),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                 ),
                 onPressed: () {
                   Get.to(() => const LoginScreen());
@@ -232,6 +235,7 @@ class _AccountPageState extends State<AccountPage> {
                 ),
               ),
             ),
+
           ],
         ),
       ),

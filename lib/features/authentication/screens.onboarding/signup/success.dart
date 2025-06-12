@@ -6,7 +6,7 @@ import 'package:flutterproject/utils/constants/sizes.dart';
 import 'package:flutterproject/utils/constants/text_strings.dart';
 import 'package:flutterproject/utils/helpers/helper_functions.dart';
 import 'package:get/get.dart';
-
+import 'package:flutterproject/utils/constants/colors.dart';
 class SuccessScreen extends StatelessWidget {
   const SuccessScreen({super.key});
   
@@ -29,7 +29,7 @@ class SuccessScreen extends StatelessWidget {
               const SizedBox(height: AppSizes.spaceBtwSections),
 
               // Buttons
-              SizedBox(width: double.infinity, child: ElevatedButton(style:ElevatedButton.styleFrom(backgroundColor:  Color(0xFF98FF98),foregroundColor: Colors.black,side: BorderSide(color: Colors.white, width: 0)) ,onPressed: () => Get.to(() => const LoginScreen()), child: const Text(AppTexts.appcontinue))),
+              SizedBox(width: double.infinity, child: ElevatedButton(style:ElevatedButton.styleFrom(backgroundColor:  AppColors.primary,foregroundColor: Colors.black,side: BorderSide(color: Colors.white, width: 0)) ,onPressed: () => Get.to(() => const LoginScreen()), child: const Text(AppTexts.appcontinue))),
 
 
             ],
