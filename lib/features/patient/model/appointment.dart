@@ -1,5 +1,5 @@
 import '../../authentication/model/patient.dart';
-import 'doctor.dart';
+import '../../home/model/doctor.dart';
 import 'feedback.dart';
 import 'prescription.dart';
 import 'payment.dart';

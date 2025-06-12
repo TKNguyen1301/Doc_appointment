@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutterproject/features/authentication/screens.onboarding/login/login.dart';
 import 'package:provider/provider.dart';
-import 'package:flutterproject/features/screens/User_info/user_info.dart' as userInfo;
 import 'package:flutterproject/features/screens/User_info/user_info.dart';
-import 'package:flutterproject/features/screens/home/home.dart' as home;
+import 'package:flutterproject/features/home/view/home.dart' as home;
 import 'package:flutterproject/features/authentication/model_view/patient_controller.dart';
 import 'package:flutterproject/utils/constants/colors.dart';
 import 'package:flutterproject/utils/helpers/helper_functions.dart';

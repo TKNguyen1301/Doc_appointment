@@ -1,5 +1,5 @@
 import 'patient.dart';
-import '../../patient/model/doctor.dart';
+import '../../home/model/doctor.dart';
 // import 'admin_model.dart';
 
 class User {
