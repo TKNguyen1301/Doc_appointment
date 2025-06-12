@@ -35,11 +35,7 @@ class _AccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
     const borderRadius = BorderRadius.all(Radius.circular(16));
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> 6c7f626 (Finish User_info)
     return Scaffold(
       backgroundColor: const Color(0xFFF0F2F5),
       body: Consumer<PatientController>(
@@ -305,10 +301,7 @@ class _AccountPageState extends State<AccountPage> {
               if (widget.onLogout != null) {
                 widget.onLogout!();
               } else {
-<<<<<<< HEAD
                 // Fallback logout logic - chỉ logout, không navigate
-=======
->>>>>>> 6c7f626 (Finish User_info)
                 final patientController = Provider.of<PatientController>(context, listen: false);
                 await patientController.logout();
                 
