@@ -5,6 +5,8 @@ import 'package:flutterproject/features/home/view_model/specialization_controlle
 import 'package:flutterproject/features/home/model/specialization.dart';
 import 'package:get/get.dart';
 import '../../search_page/view/search_doctor.dart';
+import '../../authentication/model_view/patient_controller.dart';
+import '../../home/view_model/doctor_controller.dart';
 
 class FindBySpecialitySection extends StatefulWidget {
   const FindBySpecialitySection({super.key});
@@ -14,7 +16,8 @@ class FindBySpecialitySection extends StatefulWidget {
 }
 
 class _FindBySpecialitySectionState extends State<FindBySpecialitySection> {
-  final SpecializationService _specializationService = SpecializationService();
+  final DoctorController _doctorController = DoctorController();
+  final PatientController _patientController = PatientController();
   List<Specialization> specializations = [];
   bool isLoading = true;
   String? error;
@@ -22,20 +25,32 @@ class _FindBySpecialitySectionState extends State<FindBySpecialitySection> {
   @override
   void initState() {
     super.initState();
-    _loadSpecializations();
+    _loadSpecializationsFromDoctors();
   }
 
-  Future<void> _loadSpecializations() async {
+  Future<void> _loadSpecializationsFromDoctors() async {
     try {
       setState(() {
         isLoading = true;
         error = null;
       });
       
-      final result = await _specializationService.getAllSpecializations();
+      await _patientController.isAuthenticated();
+      final token = _patientController.token;
+      
+      // Get doctors data which contains specialization info
+      final doctors = await _doctorController.fetchAllDoctors(token: token);
+      
+      // Extract unique specializations from doctors
+      final specializationMap = <int, Specialization>{};
+      for (final doctor in doctors) {
+        if (doctor.specialization != null) {
+          specializationMap[doctor.specialization!.specializationId] = doctor.specialization!;
+        }
+      }
       
       setState(() {
-        specializations = result;
+        specializations = specializationMap.values.toList();
         isLoading = false;
       });
     } catch (e) {
@@ -43,13 +58,11 @@ class _FindBySpecialitySectionState extends State<FindBySpecialitySection> {
         error = e.toString();
         isLoading = false;
         
-        // Fallback data an toàn hơn
         specializations = _createFallbackSpecializations();
       });
       
-      // Log the error for debugging
       if (kDebugMode) {
-        print('Error loading specializations: $e');
+        print('Error loading specializations from doctors: $e');
       }
     }
   }
@@ -84,7 +97,6 @@ class _FindBySpecialitySectionState extends State<FindBySpecialitySection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Tiêu đề chính
           const Text(
             'Find by Speciality',
             style: TextStyle(
@@ -97,7 +109,6 @@ class _FindBySpecialitySectionState extends State<FindBySpecialitySection> {
 
           const SizedBox(height: 24),
 
-          // Hiển thị loading, error hoặc danh sách chuyên khoa
           if (isLoading)
             const SizedBox(
               height: 100,
@@ -115,7 +126,7 @@ class _FindBySpecialitySectionState extends State<FindBySpecialitySection> {
                     Text('Error: $error'),
                     const SizedBox(height: 8),
                     ElevatedButton(
-                      onPressed: _loadSpecializations,
+                      onPressed: _loadSpecializationsFromDoctors,
                       child: const Text('Retry'),
                     ),
                   ],
@@ -131,7 +142,6 @@ class _FindBySpecialitySectionState extends State<FindBySpecialitySection> {
                     label: specialization.name,
                     image: specialization.image.isNotEmpty ? specialization.image : null,
                     onTap: () {
-                      // Chuyển đến trang tìm kiếm bác sĩ theo chuyên khoa
                       Get.to(() => DoctorSearchPage(specialty: specialization.name));
                     },
                   );

@@ -17,8 +17,8 @@ class AppImages {
 
   static const String relax= "/Users/nguyen/Documents/flutterproject/assets/images/on_boarding_images/snapedit_1729954779426.png";
 
-  static const String pushup = "/Users/nguyen/Documents/flutterproject/assets/images/home_images/pushup.png";
-  static const String plank = "/Users/nguyen/Documents/flutterproject/assets/images/home_images/plank.png";
-  static const String squat = "/Users/nguyen/Documents/flutterproject/assets/images/home_images/squat.png";
+  static const String pushup = "assets/images/carousel/pushup.png";
+  static const String plank = "assets/images/carousel/plank.png";
+  static const String squat = "assets/images/carousel/squat.png";
 
 }

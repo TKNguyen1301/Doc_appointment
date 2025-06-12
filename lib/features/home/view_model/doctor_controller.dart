@@ -19,6 +19,7 @@ class DoctorController {
     String? shiftType,
     String? startTime,
     String? endTime,
+    String? token, // Add token parameter
   }) async {
     final query = <String, String>{
       if (specializationId != null) 'specialization_id': specializationId,
@@ -30,7 +31,12 @@ class DoctorController {
     final uri = Uri.parse('$_baseUrl/all').replace(queryParameters: query);
     
     try {
-      final response = await http.get(uri);
+      Map<String, String> headers = {};
+      if (token != null) {
+        headers[HttpHeaders.authorizationHeader] = 'Bearer $token';
+      }
+      
+      final response = await http.get(uri, headers: headers);
 
       if (response.statusCode == 200) {
         if (kDebugMode) {

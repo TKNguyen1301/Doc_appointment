@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterproject/features/home/widget/doctor_card.dart';
 import 'package:flutterproject/features/home/model/doctor.dart';
 import 'package:flutterproject/features/home/view_model/doctor_controller.dart';
+import '../../authentication/model_view/patient_controller.dart';
 
 /// Widget chính hiển thị section "Top Doctors to Book"
 class DoctorListSection extends StatefulWidget {
@@ -13,6 +14,7 @@ class DoctorListSection extends StatefulWidget {
 
 class _DoctorListSectionState extends State<DoctorListSection> {
   final DoctorController _doctorController = DoctorController();
+  final PatientController _patientController = PatientController();
   List<Doctor> doctors = [];
   bool isLoading = true;
   String? error;
@@ -30,7 +32,11 @@ class _DoctorListSectionState extends State<DoctorListSection> {
         error = null;
       });
 
-      final result = await _doctorController.fetchAllDoctors();
+      // Get token for authentication
+      await _patientController.isAuthenticated();
+      final token = _patientController.token;
+
+      final result = await _doctorController.fetchAllDoctors(token: token);
 
       setState(() {
         doctors = result;
